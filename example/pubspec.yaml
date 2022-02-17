@@ -1,0 +1,24 @@
+name: ncnn_yolox_flutter_example
+description: Demonstrates how to use the ncnn_yolox_flutter plugin.
+
+publish_to: "none"
+
+environment:
+  sdk: ">=2.16.1 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  image_picker: ^0.8.4+8
+
+  ncnn_yolox_flutter:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  pedantic_mono: any
+
+flutter:
+  uses-material-design: true
