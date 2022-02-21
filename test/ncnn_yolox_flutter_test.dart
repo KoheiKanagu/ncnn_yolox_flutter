@@ -1,9 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ncnn_yolox_flutter/ncnn_yolox_flutter.dart';
 
 void main() {
-  const MethodChannel channel = MethodChannel('ncnn_yolox_flutter');
+  const channel = MethodChannel('ncnn_yolox_flutter');
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -15,9 +14,5 @@ void main() {
 
   tearDown(() {
     channel.setMockMethodCallHandler(null);
-  });
-
-  test('getPlatformVersion', () async {
-    expect(await NcnnYoloxFlutter.platformVersion, '42');
   });
 }
