@@ -1,3 +1,7 @@
+## 0.0.3
+
+- Class name changed.
+
 ## 0.0.2
 
 - Added a method to draw the resulting rectangle of YOLOX to image.
