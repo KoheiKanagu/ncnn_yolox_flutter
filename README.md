@@ -24,6 +24,8 @@ For example, you can use [yolox_onnx_to_ncnn.ipynb](notebooks/yolox_onnx_to_ncnn
 
 **Note that you will need to manually modify the model.**
 
+If you want to use yolox_tiny, you can find it in [example/assets/yolox](example/assets/yolox).
+
 ---
 
 Don't forget to add the model of assets to your `pubspec.yaml`.
