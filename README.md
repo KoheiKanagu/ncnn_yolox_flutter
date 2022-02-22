@@ -24,6 +24,8 @@ For example, you can use [yolox_onnx_to_ncnn.ipynb](notebooks/yolox_onnx_to_ncnn
 
 **Note that you will need to manually modify the model.**
 
+---
+
 If you want to use yolox_tiny, you can find it in [example/assets/yolox](example/assets/yolox).
 
 ---
@@ -93,7 +95,7 @@ Change `ncnn_DIR` in [android/CMakeLists.txt](android/CMakeLists.txt) if you wan
 
 ### 3. Change the parameters of YOLOX
 
-Change [ios/Classes/yolox.cpp](ios/Classes/yolox.cpp) if necessary.
+Change [ios/Classes/yolox.cpp](IOS/Classes/yolox.cpp) if you want.
 
 For example, if you want to change the size of the input image, change `YOLOX_TARGET_SIZE`.
 
