@@ -29,7 +29,9 @@
 
 #define YOLOX_NMS_THRESH  0.45 // nms threshold
 #define YOLOX_CONF_THRESH 0.25 // threshold of bounding box prob
-#define YOLOX_TARGET_SIZE 640  // target image size after resize, might use 416 for small model
+#define YOLOX_TARGET_SIZE 416  // target image size after resize, might use 416 for small model
+
+ncnn::Net yolox;
 
 // YOLOX use the same focus in yolov5
 class YoloV5Focus : public ncnn::Layer
@@ -248,20 +250,20 @@ static void generate_yolox_proposals(std::vector<GridAndStride> grid_strides, co
 
 static int detect_yolox(const cv::Mat& bgr, std::vector<Object>& objects)
 {
-    ncnn::Net yolox;
+    // ncnn::Net yolox;
 
-    yolox.opt.use_vulkan_compute = true;
+    // yolox.opt.use_vulkan_compute = true;
     // yolox.opt.use_bf16_storage = true;
 
     // Focus in yolov5
-    yolox.register_custom_layer("YoloV5Focus", YoloV5Focus_layer_creator);
+    // yolox.register_custom_layer("YoloV5Focus", YoloV5Focus_layer_creator);
 
     // original pretrained model from https://github.com/Megvii-BaseDetection/YOLOX
     // ncnn model param: https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s_ncnn.tar.gz
     // NOTE that newest version YOLOX remove normalization of model (minus mean and then div by std),
     // which might cause your model outputs becoming a total mess, plz check carefully.
-    yolox.load_param("yolox.param");
-    yolox.load_model("yolox.bin");
+    // yolox.load_param("yolox.param");
+    // yolox.load_model("yolox.bin");
 
     int img_w = bgr.cols;
     int img_h = bgr.rows;
@@ -415,4 +417,40 @@ int main(int argc, char** argv)
     draw_objects(m, objects);
 
     return 0;
+}
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) void initYolox(char *modelPath, char *paramPath)
+{
+    yolox.register_custom_layer("YoloV5Focus", YoloV5Focus_layer_creator);
+    yolox.load_param(paramPath);
+    yolox.load_model(modelPath);
+}
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *detect(char *imagepath)
+{
+    cv::Mat m = cv::imread(imagepath, 1);
+
+    // Exit if the image does not load.
+    if (m.empty())
+    {
+        NCNN_LOGE("cv::imread %s failed", imagepath);
+        return new char[0];
+    }
+
+    std::vector<Object> objects;
+
+    detect_yolox(m, objects);
+
+    std::string result = "";
+    for (int i = 0; i < (int)objects.size(); i++)
+    {
+        Object obj = objects[i];
+        result += std::to_string(obj.rect.x) + "," + std::to_string(obj.rect.y) + "," + std::to_string(obj.rect.width) + "," + std::to_string(obj.rect.height) + "," + std::to_string(obj.label) + "," + std::to_string(obj.prob) + "\n";
+    }
+
+    char *result_c = new char[result.length() + 1];
+    strcpy(result_c, result.c_str());
+    free(result_c);
+
+    return result_c;
 }
