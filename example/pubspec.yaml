@@ -10,15 +10,15 @@ dependencies:
   flutter:
     sdk: flutter
   image_picker: ^0.8.4+8
-
   ncnn_yolox_flutter:
     path: ../
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   pedantic_mono: any
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/yolox/

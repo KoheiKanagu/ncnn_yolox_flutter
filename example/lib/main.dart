@@ -1,62 +1,283 @@
-import 'package:flutter/material.dart';
-import 'dart:async';
+// ignore_for_file: avoid_print
 
-import 'package:flutter/services.dart';
+import 'dart:io';
+import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:ncnn_yolox_flutter/ncnn_yolox_flutter.dart';
 
-void main() {
-  runApp(const MyApp());
+final ncnn = NcnnYoloxFlutter();
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await ncnn.initYolox(
+    modelPath: 'assets/yolox/yolox.bin',
+    paramPath: 'assets/yolox/yolox.param',
+  );
+
+  runApp(
+    const MyApp(),
+  );
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-          await NcnnYoloxFlutter.platformVersion ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
-  }
+class MyApp extends StatelessWidget {
+  const MyApp({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+ui.Image? _previewImage;
+
+List<YoloxResults> _results = [];
+
+final List<String> _labels = [
+  'person',
+  'bicycle',
+  'car',
+  'motorcycle',
+  'airplane',
+  'bus',
+  'train',
+  'truck',
+  'boat',
+  'traffic light',
+  'fire hydrant',
+  'stop sign',
+  'parking meter',
+  'bench',
+  'bird',
+  'cat',
+  'dog',
+  'horse',
+  'sheep',
+  'cow',
+  'elephant',
+  'bear',
+  'zebra',
+  'giraffe',
+  'backpack',
+  'umbrella',
+  'handbag',
+  'tie',
+  'suitcase',
+  'frisbee',
+  'skis',
+  'snowboard',
+  'sports ball',
+  'kite',
+  'baseball bat',
+  'baseball glove',
+  'skateboard',
+  'surfboard',
+  'tennis racket',
+  'bottle',
+  'wine glass',
+  'cup',
+  'fork',
+  'knife',
+  'spoon',
+  'bowl',
+  'banana',
+  'apple',
+  'sandwich',
+  'orange',
+  'broccoli',
+  'carrot',
+  'hot dog',
+  'pizza',
+  'donut',
+  'cake',
+  'chair',
+  'couch',
+  'potted plant',
+  'bed',
+  'dining table',
+  'toilet',
+  'tv',
+  'laptop',
+  'mouse',
+  'remote',
+  'keyboard',
+  'cell phone',
+  'microwave',
+  'oven',
+  'toaster',
+  'sink',
+  'refrigerator',
+  'book',
+  'clock',
+  'vase',
+  'scissors',
+  'teddy bear',
+  'hair drier',
+  'toothbrush'
+];
+
+class _MyHomePageState extends State<MyHomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final image =
+              await ImagePicker().pickImage(source: ImageSource.camera);
+          if (image == null) {
+            return;
+          }
+
+          _results = ncnn.detect(imagePath: image.path);
+
+          final decodedImage = await decodeImageFromList(
+            File(
+              image.path,
+            ).readAsBytesSync(),
+          );
+
+          setState(
+            () {
+              _previewImage = decodedImage;
+            },
+          );
+        },
+        child: const Icon(Icons.camera_alt_outlined),
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (_previewImage == null) {
+            return const Center(
+              child: Text('NO IMAGE'),
+            );
+          }
+
+          final imageWidget = Expanded(
+            flex: 2,
+            child: FittedBox(
+              child: SizedBox(
+                width: _previewImage!.width.toDouble(),
+                height: _previewImage!.height.toDouble(),
+                child: CustomPaint(
+                  painter: YoloxPainter(
+                    image: _previewImage!,
+                    results: _results,
+                  ),
+                ),
+              ),
+            ),
+          );
+
+          final listWidget = Expanded(
+            child: ListView(
+              children: _results
+                  .map(
+                    (e) => Text(
+                      e.toString(),
+                    ),
+                  )
+                  .toList(),
+            ),
+          );
+
+          return Center(
+            child: constraints.maxWidth < constraints.maxHeight
+                ? Column(
+                    children: [
+                      imageWidget,
+                      const SizedBox(height: 16),
+                      listWidget,
+                    ],
+                  )
+                : Row(
+                    children: [
+                      imageWidget,
+                      listWidget,
+                    ],
+                  ),
+          );
+        },
       ),
     );
   }
+}
+
+class YoloxPainter extends CustomPainter {
+  YoloxPainter({
+    required this.image,
+    required this.results,
+  });
+
+  final ui.Image image;
+
+  final List<YoloxResults> results;
+
+  final _paint = Paint()
+    ..color = Colors.red
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 24;
+
+  final _textStyle = const TextStyle(
+    color: Colors.red,
+    fontSize: 128,
+  );
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawImage(image, Offset.zero, Paint());
+
+    for (final e in results) {
+      final rect = ui.Rect.fromLTWH(
+        e.x,
+        e.y,
+        e.width,
+        e.height,
+      );
+      canvas.drawRect(
+        rect,
+        _paint,
+      );
+
+      TextPainter(
+        text: TextSpan(
+          text: '${_labels[e.label]}: ${(e.prob * 100).toStringAsFixed(2)}%',
+          style: _textStyle,
+        ),
+        textDirection: ui.TextDirection.ltr,
+      )
+        ..layout(
+          minWidth: 0,
+        )
+        ..paint(
+          canvas,
+          Offset(
+            rect.left,
+            rect.top,
+          ),
+        );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
