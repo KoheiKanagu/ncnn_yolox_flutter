@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_single_quotes
+// ignore_for_file: prefer_single_quotes, avoid_private_typedef_functions
 
 import 'dart:async';
 import 'dart:ffi';
@@ -11,20 +11,20 @@ import 'package:path_provider/path_provider.dart';
 
 export 'models/models.dart';
 
-typedef DetectYoloxNative = Pointer<Utf8> Function(
+typedef _DetectYoloxNative = Pointer<Utf8> Function(
   Pointer<Utf8> imagePath,
 );
 
-typedef DetectYolox = Pointer<Utf8> Function(
+typedef _DetectYolox = Pointer<Utf8> Function(
   Pointer<Utf8> imagePath,
 );
 
-typedef InitYoloxNative = Void Function(
+typedef _InitYoloxNative = Void Function(
   Pointer<Utf8> modelPath,
   Pointer<Utf8> paramPath,
 );
 
-typedef InitYolox = void Function(
+typedef _InitYolox = void Function(
   Pointer<Utf8> modelPath,
   Pointer<Utf8> paramPath,
 );
@@ -34,7 +34,7 @@ class NcnnYoloxFlutter {
       ? DynamicLibrary.open('libncnn_yolox_flutter.so')
       : DynamicLibrary.process();
 
-  DetectYolox? _detectYoloxFunction;
+  _DetectYolox? _detectYoloxFunction;
 
   /// Initialize YoloX
   /// Run it for the first time
@@ -45,12 +45,12 @@ class NcnnYoloxFlutter {
     required String modelPath,
     required String paramPath,
   }) async {
-    _detectYoloxFunction =
-        dynamicLibrary.lookupFunction<DetectYoloxNative, DetectYolox>('detect');
+    _detectYoloxFunction = dynamicLibrary
+        .lookupFunction<_DetectYoloxNative, _DetectYolox>('detect');
 
     final tempModelPath = (await _copy(modelPath)).toNativeUtf8();
     final tempParamPath = (await _copy(paramPath)).toNativeUtf8();
-    dynamicLibrary.lookupFunction<InitYoloxNative, InitYolox>('initYolox')(
+    dynamicLibrary.lookupFunction<_InitYoloxNative, _InitYolox>('initYolox')(
       tempModelPath,
       tempParamPath,
     );
