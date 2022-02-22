@@ -6,9 +6,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ncnn_yolox_flutter/ncnn_yolox_flutter.dart';
-import 'package:ncnn_yolox_flutter/yolox_results_painter.dart';
 
-final ncnn = NcnnYoloxFlutter();
+final ncnn = NcnnYolox();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
