@@ -1,6 +1,6 @@
 name: ncnn_yolox_flutter
 description: This is a plugin to run YOLOX on ncnn.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/KoheiKanagu/ncnn_yolox_flutter
 
 environment:
