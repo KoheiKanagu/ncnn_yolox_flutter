@@ -37,7 +37,7 @@ flutter:
 ### 2. Load the model
 
 ```dart
-final ncnn = NcnnYoloxFlutter();
+final ncnn = NcnnYolox();
 
 ncnn.initYolox(
   modelPath: 'assets/yolox/yolox.bin',
