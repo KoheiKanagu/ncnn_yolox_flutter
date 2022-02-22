@@ -1,5 +1,5 @@
 name: ncnn_yolox_flutter
-description: A new flutter plugin project.
+description: This is a plugin to run YOLOX on ncnn.
 version: 0.0.1
 homepage:
 
