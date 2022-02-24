@@ -1,3 +1,7 @@
+## 0.0.5
+
+- Fixed a bug that caused an error when an object was not detected.
+
 ## 0.0.4
 
 - Fixed a bug that caused an error when an object was not detected.
