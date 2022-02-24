@@ -434,7 +434,7 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *de
     if (m.empty())
     {
         NCNN_LOGE("cv::imread %s failed", imagepath);
-        return "";
+        return (char *)"";
     }
 
     std::vector<Object> objects;
@@ -444,7 +444,7 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *de
     if (objects.size() == 0)
     {
         NCNN_LOGE("No object detected");
-        return "";
+        return (char *)"";
     }
 
     std::string result = "";
@@ -456,7 +456,5 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *de
 
     char *result_c = new char[result.length() + 1];
     strcpy(result_c, result.c_str());
-    free(result_c);
-
     return result_c;
 }
