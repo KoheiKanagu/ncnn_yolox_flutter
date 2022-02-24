@@ -434,12 +434,18 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *de
     if (m.empty())
     {
         NCNN_LOGE("cv::imread %s failed", imagepath);
-        return new char[0];
+        return "";
     }
 
     std::vector<Object> objects;
 
     detect_yolox(m, objects);
+
+    if (objects.size() == 0)
+    {
+        NCNN_LOGE("No object detected");
+        return "";
+    }
 
     std::string result = "";
     for (int i = 0; i < (int)objects.size(); i++)
