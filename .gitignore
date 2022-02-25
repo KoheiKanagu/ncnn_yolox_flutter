@@ -27,3 +27,6 @@
 .dart_tool/
 .packages
 build/
+ios/ncnn.xcframework
+ios/openmp.xcframework
+android/ncnn

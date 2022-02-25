@@ -9,15 +9,34 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 A new flutter plugin project.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/KoheiKanagu/ncnn_yolox_flutter'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'KoheiKanagu' => 'kanagu@kingu.dev' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.platform = :ios, '9.0'
+  s.platform = :ios, '13.7'
 
-  # Flutter.framework does not contain a i386 slice.
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 arm64' }
   s.swift_version = '5.0'
+
+  ## If you do not need to download the ncnn library, remove it. 
+  ## From here
+  s.prepare_command = <<-CMD
+    rm -rf "ncnn.xcframework"
+    rm -rf "openmp.xcframework"
+    curl "https://github.com/KoheiKanagu/ncnn_yolox_flutter/releases/download/0.0.5/ncnn-ios-bitcode_xcframework.zip" -L -o "ncnn-ios-bitcode_xcframework.zip"
+    unzip "ncnn-ios-bitcode_xcframework.zip"
+    rm "ncnn-ios-bitcode_xcframework.zip"
+  CMD
+  ## Up to here
+
+  # https://medium.com/flutter-community/integrating-c-library-in-a-flutter-app-using-dart-ffi-38a15e16bc14
+  s.preserve_paths = 'ncnn.xcframework', 'openmp.xcframework'
+  s.xcconfig = { 
+    'OTHER_LDFLAGS' => '-framework ncnn -framework openmp',
+    'OTHER_CFLAGS' => '-DUSE_NCNN_SIMPLEOCV -DNCNN_YOLOX_FLUTTER_IOS',
+  }
+  s.ios.vendored_frameworks = 'ncnn.xcframework', 'openmp.xcframework'
+  s.library = 'c++'
 end
