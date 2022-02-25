@@ -1,0 +1,21 @@
+name: Build ncnn
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: build
+        run: .github/workflows/scripts/build_ncnn.sh
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          path: ncnn/ncnn-build-android.zip
