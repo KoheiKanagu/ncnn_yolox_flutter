@@ -1,3 +1,7 @@
+## 0.0.7
+
+- License changed
+
 ## 0.0.6
 
 - iOS is now supported.
