@@ -89,7 +89,7 @@ Please refer to the comments in these files.
 
 ### 3. Change the parameters of YOLOX
 
-Change [ios/Classes/yolox.cpp](IOS/Classes/yolox.cpp) if you want.
+Change [ios/Classes/yolox.cpp](ios/Classes/yolox.cpp) if you want.
 
 For example, if you want to change the size of the input image, change `YOLOX_TARGET_SIZE`.
 
