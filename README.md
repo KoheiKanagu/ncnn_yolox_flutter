@@ -2,10 +2,6 @@
 
 This is a plugin to run YOLOX on ncnn.
 
-I have confirmed that it works on Android.
-
-Support for iOS is TODO.
-
 ## Demo
 
 ### on Android
