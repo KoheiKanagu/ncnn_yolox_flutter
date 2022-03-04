@@ -6,15 +6,15 @@ This is a plugin to run YOLOX on ncnn.
 
 ### on Android
 
-| Real Device                                        | Simulator                                                    |
-| -------------------------------------------------- | ------------------------------------------------------------ |
-| <img src="screenshots/android_demo.gif" width=600> | <img src="screenshots/android_simulator_demo.gif" width=300> |
+| Real Device                                                                                                             | Simulator                                                                                                                         |
+| ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/screenshots/android_demo.gif?raw=true" width=600> | <img src="https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/screenshots/android_simulator_demo.gif?raw=true" width=300> |
 
 ### on iOS
 
-| Real Device                                    | Simulator                                                |
-| ---------------------------------------------- | -------------------------------------------------------- |
-| <img src="screenshots/ios_demo.gif" width=600> | <img src="screenshots/ios_simulator_demo.gif" width=300> |
+| Real Device                                                                                                         | Simulator                                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| <img src="https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/screenshots/ios_demo.gif?raw=true" width=600> | <img src="https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/screenshots/ios_simulator_demo.gif?raw=true" width=300> |
 
 ## How to use
 
