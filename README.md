@@ -10,11 +10,15 @@ Support for iOS is TODO.
 
 ### on Android
 
-![android_demo.gif](screenshots/android_demo.gif)
+| Real Device                                        | Simulator                                                    |
+| -------------------------------------------------- | ------------------------------------------------------------ |
+| <img src="screenshots/android_demo.gif" width=600> | <img src="screenshots/android_simulator_demo.gif" width=300> |
 
 ### on iOS
 
-TODO
+| Real Device                                    | Simulator                                                |
+| ---------------------------------------------- | -------------------------------------------------------- |
+| <img src="screenshots/ios_demo.gif" width=600> | <img src="screenshots/ios_simulator_demo.gif" width=300> |
 
 ## How to use
 
@@ -63,35 +67,29 @@ Please check [example/lib/main.dart](example/lib/main.dart) for specific usage.
 
 ### 1. Build ncnn
 
-See [ncnn_build.ipynb](notebooks/ncnn_build.ipynb) for details.
+See [build_ncnn.yaml](.github/workflows/build_ncnn.yaml) for details.
 
-iOS is a TODO.
+If you want the pre-built ncnn, you can download it from Artifacts in [Actions](https://github.com/KoheiKanagu/ncnn_yolox_flutter/actions/workflows/build_ncnn.yaml).
 
-### 2. Copy ncnn
+### 2. Download ncnn
 
-Copy the artifacts to the android directory.
+The library is a binary file, so it is not packaged in the repository.
+The ncnn libraries for iOS and Android are CMake and Cocoapods, downloaded from Github Releases.
 
-```sh
-unzip ncnn-build-android.zip
-cp -r content/ncnn/build-android-armv7/install/ /YOU/PATH/ncnn_yolox_flutter/android/ncnn-20220216/armeabi-v7a/
-cp -r content/ncnn/build-android-aarch64/install/ /YOU/PATH/ncnn_yolox_flutter/android/ncnn-20220216/arm64-v8a/
-```
+- [android/CMakeLists.txt](android/CMakeLists.txt)
+- [ios/ncnn_yolox_flutter.podspec](ios/ncnn_yolox_flutter.podspec)
 
-The tree will look like this
+The ncnn library zip you are downloading is the artifact of [build_ncnn.yaml](.github/workflows/build_ncnn.yaml). Change the URL if you want.
 
-```sh
-.
-├── android
-│   ├── ncnn-20220216
-│   │   ├── arm64-v8a
-│   │   │   ├── include
-│   │   │   └── lib
-│   │   └── armeabi-v7a
-│   │       ├── include
-│   │       └── lib
-```
+---
 
-Change `ncnn_DIR` in [android/CMakeLists.txt](android/CMakeLists.txt) if you want.
+If you do not want to download the ncnn library, remove the process of downloading the zip.
+Then install the ncnn library manually.
+
+Please refer to the comments in these files.
+
+- [android/CMakeLists.txt](android/CMakeLists.txt)
+- [ios/ncnn_yolox_flutter.podspec](ios/ncnn_yolox_flutter.podspec)
 
 ### 3. Change the parameters of YOLOX
 

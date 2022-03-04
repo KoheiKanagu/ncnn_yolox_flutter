@@ -140,29 +140,59 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final image =
-              await ImagePicker().pickImage(source: ImageSource.camera);
-          if (image == null) {
-            return;
-          }
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () async {
+              final image =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (image == null) {
+                return;
+              }
 
-          _results = ncnn.detect(imagePath: image.path);
+              _results = ncnn.detect(imagePath: image.path);
 
-          final decodedImage = await decodeImageFromList(
-            File(
-              image.path,
-            ).readAsBytesSync(),
-          );
+              final decodedImage = await decodeImageFromList(
+                File(
+                  image.path,
+                ).readAsBytesSync(),
+              );
 
-          setState(
-            () {
-              _previewImage = decodedImage;
+              setState(
+                () {
+                  _previewImage = decodedImage;
+                },
+              );
             },
-          );
-        },
-        child: const Icon(Icons.camera_alt_outlined),
+            child: const Icon(Icons.photo_library),
+          ),
+          const SizedBox(height: 24),
+          FloatingActionButton(
+            onPressed: () async {
+              final image =
+                  await ImagePicker().pickImage(source: ImageSource.camera);
+              if (image == null) {
+                return;
+              }
+
+              _results = ncnn.detect(imagePath: image.path);
+
+              final decodedImage = await decodeImageFromList(
+                File(
+                  image.path,
+                ).readAsBytesSync(),
+              );
+
+              setState(
+                () {
+                  _previewImage = decodedImage;
+                },
+              );
+            },
+            child: const Icon(Icons.camera_alt_outlined),
+          ),
+        ],
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {

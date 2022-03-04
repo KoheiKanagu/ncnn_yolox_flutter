@@ -13,11 +13,20 @@
 // ------------------------------------------------------------------------------
 // Copyright (C) 2020-2021, Megvii Inc. All rights reserved.
 
+#if defined(NCNN_YOLOX_FLUTTER_IOS)
+#include "ncnn/ncnn/layer.h"
+#include "ncnn/ncnn/net.h"
+#else
 #include "layer.h"
 #include "net.h"
+#endif
 
 #if defined(USE_NCNN_SIMPLEOCV)
+#if defined(NCNN_YOLOX_FLUTTER_IOS)
+#include "ncnn/ncnn/simpleocv.h"
+#else
 #include "simpleocv.h"
+#endif
 #else
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
