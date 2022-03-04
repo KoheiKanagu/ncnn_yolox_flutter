@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.11)
 include(FetchContent)
 FetchContent_Declare(
     ncnn
-    URL https://github.com/KoheiKanagu/ncnn_yolox_flutter/releases/download/0.0.5/ncnn-android.zip
+    URL https://github.com/KoheiKanagu/ncnn_yolox_flutter/releases/download/0.0.6/ncnn-android.zip
 )
 FetchContent_MakeAvailable(ncnn)
 ## Up to here
