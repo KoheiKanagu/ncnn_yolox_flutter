@@ -1,7 +1,10 @@
+## 0.0.7+1
+
+- README fixed
+
 ## 0.0.7
 
 - License changed
-- README fixed
 
 ## 0.0.6
 
