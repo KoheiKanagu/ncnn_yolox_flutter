@@ -469,3 +469,9 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) void rgb
     m.to_pixels(rgba, ncnn::Mat::PIXEL_RGBA);
     return;
 }
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) void kannaRotate(unsigned char *src, int srcw, int srch, unsigned char *dst, int dsw, int dsh, int type)
+{
+    ncnn::kanna_rotate_c3(src, srcw, srch, dst, dsw, dsh, type);
+    return;
+}

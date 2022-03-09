@@ -7,8 +7,28 @@ import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
 import 'package:flutter/services.dart';
-import 'package:ncnn_yolox_flutter/models/yolox_results.dart';
+import 'package:ncnn_yolox_flutter/models/models.dart';
 import 'package:path_provider/path_provider.dart';
+
+typedef _KannaRotateNative = Void Function(
+  Pointer<Uint8> src,
+  Int32 srcw,
+  Int32 srch,
+  Pointer<Uint8> dst,
+  Int32 dstw,
+  Int32 dsth,
+  Int8 type,
+);
+
+typedef _KannaRotate = void Function(
+  Pointer<Uint8> src,
+  int srcw,
+  int srch,
+  Pointer<Uint8> dst,
+  int dstw,
+  int dsth,
+  int type,
+);
 
 typedef _Rgb2rgbaNative = Void Function(
   Pointer<Uint8> rgb,
@@ -75,6 +95,7 @@ class NcnnYolox {
   _DetectWithPixelsYolox? _detectWithPixelsYoloxFunction;
   _Yuv420sp2rgb? _yuv420sp2rgbFunction;
   _Rgb2rgba? _rgb2rgbaFunction;
+  _KannaRotate? _kannaRotateFunction;
 
   /// Initialize YoloX
   /// Run it for the first time
@@ -95,6 +116,8 @@ class NcnnYolox {
         .lookupFunction<_Yuv420sp2rgbNative, _Yuv420sp2rgb>('yuv420sp2rgb');
     _rgb2rgbaFunction =
         dynamicLibrary.lookupFunction<_Rgb2rgbaNative, _Rgb2rgba>('rgb2rgba');
+    _kannaRotateFunction = dynamicLibrary
+        .lookupFunction<_KannaRotateNative, _KannaRotate>('kannaRotate');
 
     final tempModelPath = (await _copy(modelPath)).toNativeUtf8();
     final tempParamPath = (await _copy(paramPath)).toNativeUtf8();
@@ -324,6 +347,111 @@ class NcnnYolox {
       ..free(pixels)
       ..free(rgba);
     return results;
+  }
+
+  KannaRotateResults kannaRotate({
+    required Uint8List rgb,
+    required int width,
+    required int height,
+    KannaRotateDeviceOrientationType deviceOrientationType =
+        KannaRotateDeviceOrientationType.portraitUp,
+    int sensorOrientation = 90,
+  }) {
+    assert(_kannaRotateFunction != null, 'initYolox first');
+    assert(width > 0, 'width is too small');
+    assert(height > 0, 'height is too small');
+    assert(rgb.isNotEmpty, 'pixels is empty');
+    assert(sensorOrientation >= 0, 'sensorOrientation is too small');
+    assert(sensorOrientation <= 360, 'sensorOrientation is too big');
+    assert(sensorOrientation % 90 == 0, 'Only 0, 90, 180 or 270');
+
+    if (_kannaRotateFunction == null ||
+        width <= 0 ||
+        height <= 0 ||
+        rgb.isEmpty ||
+        sensorOrientation < 0 ||
+        sensorOrientation > 360 ||
+        sensorOrientation % 90 != 0) {
+      return KannaRotateResults.empty();
+    }
+
+    var rotateType = KannaRotateType.deg0;
+
+    switch (deviceOrientationType) {
+      case KannaRotateDeviceOrientationType.portraitUp:
+        rotateType = KananaRotateTypeExtension.fromDegree(
+          (0 + sensorOrientation) % 360,
+        );
+        break;
+      case KannaRotateDeviceOrientationType.landscapeRight:
+        rotateType = KananaRotateTypeExtension.fromDegree(
+          (90 + sensorOrientation) % 360,
+        );
+        break;
+      case KannaRotateDeviceOrientationType.portraitDown:
+        rotateType = KananaRotateTypeExtension.fromDegree(
+          (180 + sensorOrientation) % 360,
+        );
+        break;
+      case KannaRotateDeviceOrientationType.landscapeLeft:
+        rotateType = KananaRotateTypeExtension.fromDegree(
+          (270 + sensorOrientation) % 360,
+        );
+        break;
+    }
+
+    if (rotateType == KannaRotateType.deg0) {
+      return KannaRotateResults(
+        rgb,
+        width,
+        height,
+      );
+    }
+
+    final src = calloc.allocate<Uint8>(rgb.length);
+    for (var i = 0; i < rgb.length; i++) {
+      src[i] = rgb[i];
+    }
+    final srcw = width;
+    final srch = height;
+
+    final dst = calloc.allocate<Uint8>(rgb.length);
+    var dstw = width;
+    var dsth = height;
+
+    switch (rotateType) {
+      case KannaRotateType.deg0:
+      case KannaRotateType.deg180:
+        break;
+      case KannaRotateType.deg90:
+      case KannaRotateType.deg270:
+        dstw = height;
+        dsth = width;
+        break;
+    }
+
+    final type = rotateType.type;
+
+    _kannaRotateFunction!(
+      src,
+      srcw,
+      srch,
+      dst,
+      dstw,
+      dsth,
+      type,
+    );
+
+    final results = _copyUint8PointerToUint8List(dst, rgb.length);
+    calloc
+      ..free(src)
+      ..free(dst);
+
+    return KannaRotateResults(
+      results,
+      dstw,
+      dsth,
+    );
   }
 
   /// Copy to Uint8List
