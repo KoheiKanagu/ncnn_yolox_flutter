@@ -19,9 +19,10 @@ class YoloxResultsPainter extends CustomPainter {
     this.drawRectPaint = drawRectPaint ?? defaultDrawRectPaint;
 
     this.labelTextStyle = labelTextStyle ??
-        const TextStyle(
+        TextStyle(
           color: Colors.red,
           fontWeight: FontWeight.bold,
+          fontSize: min(image.width, image.height) * 0.05,
         );
   }
 
@@ -53,7 +54,7 @@ class YoloxResultsPainter extends CustomPainter {
 
       TextPainter(
         text: TextSpan(
-          text: '${labels[e.label]}: ${(e.prob * 100).toStringAsFixed(2)}%',
+          text: ' ${labels[e.label]}: ${(e.prob * 100).toStringAsFixed(2)}%',
           style: labelTextStyle,
         ),
         textDirection: ui.TextDirection.ltr,
