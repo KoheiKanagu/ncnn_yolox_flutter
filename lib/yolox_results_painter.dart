@@ -21,6 +21,7 @@ class YoloxResultsPainter extends CustomPainter {
     this.labelTextStyle = labelTextStyle ??
         const TextStyle(
           color: Colors.red,
+          fontWeight: FontWeight.bold,
         );
   }
 
