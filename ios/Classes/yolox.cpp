@@ -257,26 +257,8 @@ static void generate_yolox_proposals(std::vector<GridAndStride> grid_strides, co
     } // point anchor loop
 }
 
-static int detect_yolox(const cv::Mat& bgr, std::vector<Object>& objects)
+static int detect_yolox(unsigned char *pixels, int type, int img_w, int img_h, std::vector<Object> &objects)
 {
-    // ncnn::Net yolox;
-
-    // yolox.opt.use_vulkan_compute = true;
-    // yolox.opt.use_bf16_storage = true;
-
-    // Focus in yolov5
-    // yolox.register_custom_layer("YoloV5Focus", YoloV5Focus_layer_creator);
-
-    // original pretrained model from https://github.com/Megvii-BaseDetection/YOLOX
-    // ncnn model param: https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s_ncnn.tar.gz
-    // NOTE that newest version YOLOX remove normalization of model (minus mean and then div by std),
-    // which might cause your model outputs becoming a total mess, plz check carefully.
-    // yolox.load_param("yolox.param");
-    // yolox.load_model("yolox.bin");
-
-    int img_w = bgr.cols;
-    int img_h = bgr.rows;
-
     int w = img_w;
     int h = img_h;
     float scale = 1.f;
@@ -292,7 +274,8 @@ static int detect_yolox(const cv::Mat& bgr, std::vector<Object>& objects)
         h = YOLOX_TARGET_SIZE;
         w = w * scale;
     }
-    ncnn::Mat in = ncnn::Mat::from_pixels_resize(bgr.data, ncnn::Mat::PIXEL_BGR, img_w, img_h, w, h);
+
+    ncnn::Mat in = ncnn::Mat::from_pixels_resize(pixels, type, img_w, img_h, w, h);
 
     // pad to YOLOX_TARGET_SIZE rectangle
     int wpad = YOLOX_TARGET_SIZE - w;
@@ -354,6 +337,19 @@ static int detect_yolox(const cv::Mat& bgr, std::vector<Object>& objects)
     return 0;
 }
 
+static int detect_yolox_cv_mat(const cv::Mat &bgr, std::vector<Object> &objects)
+{
+    int img_w = bgr.cols;
+    int img_h = bgr.rows;
+    return detect_yolox(bgr.data, ncnn::Mat::PIXEL_BGR, img_w, img_w, objects);
+}
+
+static int detect_yolox_pixels(unsigned char *pixels, int img_w, int img_h, std::vector<Object> &objects)
+{
+    // https://github.com/Tencent/ncnn/blob/master/docs/how-to-use-and-FAQ/FAQ-ncnn-produce-wrong-result.md#check-input-is-rgb-or-bgr
+    return detect_yolox(pixels, ncnn::Mat::PIXEL_RGB2BGR, img_w, img_h, objects);
+}
+
 static void draw_objects(const cv::Mat& bgr, const std::vector<Object>& objects)
 {
     static const char* class_names[] = {
@@ -403,53 +399,21 @@ static void draw_objects(const cv::Mat& bgr, const std::vector<Object>& objects)
     cv::waitKey(0);
 }
 
-int main(int argc, char** argv)
-{
-    if (argc != 2)
-    {
-        fprintf(stderr, "Usage: %s [imagepath]\n", argv[0]);
-        return -1;
-    }
-
-    const char* imagepath = argv[1];
-
-    cv::Mat m = cv::imread(imagepath, 1);
-    if (m.empty())
-    {
-        fprintf(stderr, "cv::imread %s failed\n", imagepath);
-        return -1;
-    }
-
-    std::vector<Object> objects;
-    detect_yolox(m, objects);
-
-    draw_objects(m, objects);
-
-    return 0;
-}
-
 extern "C" __attribute__((visibility("default"))) __attribute__((used)) void initYolox(char *modelPath, char *paramPath)
 {
+    // Focus in yolov5
     yolox.register_custom_layer("YoloV5Focus", YoloV5Focus_layer_creator);
+
+    // original pretrained model from https://github.com/Megvii-BaseDetection/YOLOX
+    // ncnn model param: https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s_ncnn.tar.gz
+    // NOTE that newest version YOLOX remove normalization of model (minus mean and then div by std),
+    // which might cause your model outputs becoming a total mess, plz check carefully.
     yolox.load_param(paramPath);
     yolox.load_model(modelPath);
 }
 
-extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *detect(char *imagepath)
+char *parseResultsObjects(std::vector<Object> &objects)
 {
-    cv::Mat m = cv::imread(imagepath, 1);
-
-    // Exit if the image does not load.
-    if (m.empty())
-    {
-        NCNN_LOGE("cv::imread %s failed", imagepath);
-        return (char *)"";
-    }
-
-    std::vector<Object> objects;
-
-    detect_yolox(m, objects);
-
     if (objects.size() == 0)
     {
         NCNN_LOGE("No object detected");
@@ -466,4 +430,42 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *de
     char *result_c = new char[result.length() + 1];
     strcpy(result_c, result.c_str());
     return result_c;
+}
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *detectWithImagePath(char *imagepath)
+{
+    cv::Mat m = cv::imread(imagepath, 1);
+
+    // Exit if the image does not load.
+    if (m.empty())
+    {
+        NCNN_LOGE("cv::imread %s failed", imagepath);
+        return (char *)"";
+    }
+
+    std::vector<Object> objects;
+    detect_yolox_cv_mat(m, objects);
+
+    return parseResultsObjects(objects);
+}
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *detectWithPixels(unsigned char *pixels, int width, int height)
+{
+    std::vector<Object> objects;
+    detect_yolox_pixels(pixels, width, height, objects);
+
+    return parseResultsObjects(objects);
+}
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) void yuv420sp2rgb(unsigned char *yuv420sp, int width, int height, unsigned char *rgb)
+{
+    ncnn::yuv420sp2rgb(yuv420sp, width, height, rgb);
+    return;
+}
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) void rgb2rgba(unsigned char *rgb, int width, int height, unsigned char *rgba)
+{
+    ncnn::Mat m = ncnn::Mat::from_pixels(rgb, ncnn::Mat::PIXEL_RGB2BGRA, width, height);
+    m.to_pixels(rgba, ncnn::Mat::PIXEL_RGBA);
+    return;
 }
