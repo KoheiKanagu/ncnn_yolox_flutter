@@ -1,6 +1,6 @@
 ## 0.1.1
 
-- Fixed orientation of preview image.
+- Fixed orientation of preview image in example app.
 
 ## 0.1.0
 
