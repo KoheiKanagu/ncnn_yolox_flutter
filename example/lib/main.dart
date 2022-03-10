@@ -1,11 +1,11 @@
-// ignore_for_file: avoid_print
-
-import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ncnn_yolox_flutter/ncnn_yolox_flutter.dart';
+import 'package:ncnn_yolox_flutter_example/widgets/body_layout_builder_widget.dart';
+import 'package:ncnn_yolox_flutter_example/widgets/image_floating_action_button_widget.dart';
+import 'package:ncnn_yolox_flutter_example/widgets/image_stream_floating_action_button_widget.dart';
 
 final ncnn = NcnnYolox();
 
@@ -47,10 +47,6 @@ class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
-
-ui.Image? _previewImage;
-
-List<YoloxResults> _results = [];
 
 final List<String> _labels = [
   'person',
@@ -136,118 +132,59 @@ final List<String> _labels = [
 ];
 
 class _MyHomePageState extends State<MyHomePage> {
+  ui.Image? _previewImage;
+
+  List<YoloxResults> _yoloxResults = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    void _setResultsState(
+      List<YoloxResults> results,
+      ui.Image image,
+    ) {
+      setState(() {
+        _yoloxResults = results;
+        _previewImage = image;
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          FloatingActionButton(
-            onPressed: () async {
-              final image =
-                  await ImagePicker().pickImage(source: ImageSource.gallery);
-              if (image == null) {
-                return;
-              }
-
-              _results = ncnn.detect(imagePath: image.path);
-
-              final decodedImage = await decodeImageFromList(
-                File(
-                  image.path,
-                ).readAsBytesSync(),
-              );
-
-              setState(
-                () {
-                  _previewImage = decodedImage;
-                },
-              );
-            },
-            child: const Icon(Icons.photo_library),
+          ImageStreamFloatingActionButtonWidget(
+            ncnn: ncnn,
+            onDetected: _setResultsState,
           ),
           const SizedBox(height: 24),
-          FloatingActionButton(
-            onPressed: () async {
-              final image =
-                  await ImagePicker().pickImage(source: ImageSource.camera);
-              if (image == null) {
-                return;
-              }
-
-              _results = ncnn.detect(imagePath: image.path);
-
-              final decodedImage = await decodeImageFromList(
-                File(
-                  image.path,
-                ).readAsBytesSync(),
-              );
-
-              setState(
-                () {
-                  _previewImage = decodedImage;
-                },
-              );
-            },
-            child: const Icon(Icons.camera_alt_outlined),
+          ImageFloatingActionButtonWidget(
+            imageSource: ImageSource.camera,
+            ncnn: ncnn,
+            onDetected: _setResultsState,
+          ),
+          const SizedBox(height: 24),
+          ImageFloatingActionButtonWidget(
+            imageSource: ImageSource.gallery,
+            ncnn: ncnn,
+            onDetected: _setResultsState,
           ),
         ],
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          if (_previewImage == null) {
-            return const Center(
-              child: Text('NO IMAGE'),
-            );
-          }
-
-          final imageWidget = Expanded(
-            flex: 2,
-            child: FittedBox(
-              child: SizedBox(
-                width: _previewImage!.width.toDouble(),
-                height: _previewImage!.height.toDouble(),
-                child: CustomPaint(
-                  painter: YoloxResultsPainter(
-                    image: _previewImage!,
-                    results: _results,
-                    labels: _labels,
-                  ),
-                ),
-              ),
-            ),
-          );
-
-          final listWidget = Expanded(
-            child: ListView(
-              children: _results
-                  .map(
-                    (e) => Text(
-                      e.toString(),
-                    ),
-                  )
-                  .toList(),
-            ),
-          );
-
-          return Center(
-            child: constraints.maxWidth < constraints.maxHeight
-                ? Column(
-                    children: [
-                      imageWidget,
-                      const SizedBox(height: 16),
-                      listWidget,
-                    ],
-                  )
-                : Row(
-                    children: [
-                      imageWidget,
-                      listWidget,
-                    ],
-                  ),
-          );
-        },
+      body: BodyLayoutBuilderWidget(
+        previewImage: _previewImage,
+        results: _yoloxResults,
+        labels: _labels,
       ),
     );
   }

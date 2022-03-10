@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -14,13 +15,14 @@ class YoloxResultsPainter extends CustomPainter {
     final defaultDrawRectPaint = Paint()
       ..color = Colors.red
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 24;
+      ..strokeWidth = min(image.width, image.height) * 0.01;
     this.drawRectPaint = drawRectPaint ?? defaultDrawRectPaint;
 
     this.labelTextStyle = labelTextStyle ??
-        const TextStyle(
+        TextStyle(
           color: Colors.red,
-          fontSize: 128,
+          fontWeight: FontWeight.bold,
+          fontSize: min(image.width, image.height) * 0.05,
         );
   }
 
@@ -52,7 +54,7 @@ class YoloxResultsPainter extends CustomPainter {
 
       TextPainter(
         text: TextSpan(
-          text: '${labels[e.label]}: ${(e.prob * 100).toStringAsFixed(2)}%',
+          text: ' ${labels[e.label]}: ${(e.prob * 100).toStringAsFixed(2)}%',
           style: labelTextStyle,
         ),
         textDirection: ui.TextDirection.ltr,

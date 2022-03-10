@@ -16,6 +16,10 @@ This is a plugin to run YOLOX on ncnn.
 | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | <img src="https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/screenshots/ios_demo.gif?raw=true" width=600> | <img src="https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/screenshots/ios_simulator_demo.gif?raw=true" width=300> |
 
+### Stream
+
+<img src="https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/screenshots/ios_stream_demo.gif?raw=true" width=300>
+
 ## How to use
 
 ### 1. Add the YOLOX model to assets
@@ -51,13 +55,22 @@ ncnn.initYolox(
 
 ### 3. Get the result
 
-Give the file path of the image to `detect` to get the result.
-
 ```dart
-_results = ncnn.detect(imagePath: image.path);
+/// When using image file
+_results = ncnn.detect(
+  imagePath: "path",
+);
+
+/// When using image pixels
+_results = ncnn.detect(
+  pixels: image.pixels,
+  pixelFormat: PixelFormat.bgra,
+  width: image.width,
+  height: image.height,
+);
 ```
 
-Please check [example/lib/main.dart](example/lib/main.dart) for specific usage.
+Please check [example/lib](example/lib) for specific usage.
 
 ## How to set up for using custom ncnn and custom YOLOX model
 
