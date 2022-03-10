@@ -1,3 +1,7 @@
+## 0.1.1
+
+- Fixed orientation of preview image.
+
 ## 0.1.0
 
 - Can execute YOLOX on `Uint8List` pixel data.
