@@ -153,6 +153,8 @@ class NcnnYolox {
   ///
   /// When detecting from an image file, specify [imagePath].
   /// The [imagePath] should be the path to the image, such as "assets/image.jpg".
+  /// **The Orientation in the Exif of the image file is ignored**.
+  /// You may need to rotate the image if the object is not detected successfully.
   ///
   /// When detecting from an image byte array, specify [pixels], [pixelFormat], [height] and [width].
   /// [pixels] is pixel data of the image. [pixelFormat] is the pixel format.
