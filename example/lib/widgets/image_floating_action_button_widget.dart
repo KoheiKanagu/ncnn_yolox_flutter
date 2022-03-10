@@ -28,13 +28,25 @@ class ImageFloatingActionButtonWidget extends StatelessWidget {
           return;
         }
 
-        final results = ncnn.detect(imagePath: image.path);
-
         final decodedImage = await decodeImageFromList(
           File(
             image.path,
           ).readAsBytesSync(),
         );
+
+        final pixels = (await decodedImage.toByteData(
+          format: ui.ImageByteFormat.rawRgba,
+        ))!
+            .buffer
+            .asUint8List();
+
+        final results = ncnn.detect(
+          pixels: pixels,
+          pixelFormat: PixelFormat.rgba,
+          width: decodedImage.width,
+          height: decodedImage.height,
+        );
+
         onDetected(results, decodedImage);
       },
       child: Icon(
