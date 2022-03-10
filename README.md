@@ -57,6 +57,7 @@ ncnn.initYolox(
 
 ```dart
 /// When using image file
+/// **Exif Orientation is ignored**
 _results = ncnn.detect(
   imagePath: "path",
 );
