@@ -344,10 +344,10 @@ static int detect_yolox_cv_mat(const cv::Mat &bgr, std::vector<Object> &objects)
     return detect_yolox(bgr.data, ncnn::Mat::PIXEL_BGR, img_w, img_h, objects);
 }
 
-static int detect_yolox_pixels(const unsigned char *pixels, int img_w, int img_h, std::vector<Object> &objects)
+static int detect_yolox_pixels(const unsigned char *pixels, int pixelType, int img_w, int img_h, std::vector<Object> &objects)
 {
     // https://github.com/Tencent/ncnn/blob/master/docs/how-to-use-and-FAQ/FAQ-ncnn-produce-wrong-result.md#check-input-is-rgb-or-bgr
-    return detect_yolox(pixels, ncnn::Mat::PIXEL_RGB2BGR, img_w, img_h, objects);
+    return detect_yolox(pixels, pixelType, img_w, img_h, objects);
 }
 
 static void draw_objects(const cv::Mat& bgr, const std::vector<Object>& objects)
@@ -449,10 +449,10 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *de
     return parseResultsObjects(objects);
 }
 
-extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *detectWithPixels(const unsigned char *pixels, int width, int height)
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *detectWithPixels(const unsigned char *pixels, int pixelType, int width, int height)
 {
     std::vector<Object> objects;
-    detect_yolox_pixels(pixels, width, height, objects);
+    detect_yolox_pixels(pixels, pixelType, width, height, objects);
 
     return parseResultsObjects(objects);
 }
@@ -470,8 +470,22 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) void rgb
     return;
 }
 
-extern "C" __attribute__((visibility("default"))) __attribute__((used)) void kannaRotate(const unsigned char *src, int srcw, int srch, unsigned char *dst, int dsw, int dsh, int type)
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) void kannaRotate(const unsigned char *src, int channel, int srcw, int srch, unsigned char *dst, int dsw, int dsh, int type)
 {
-    ncnn::kanna_rotate_c3(src, srcw, srch, dst, dsw, dsh, type);
+    switch (channel)
+    {
+    case 1:
+        ncnn::kanna_rotate_c1(src, srcw, srch, dst, dsw, dsh, type);
+        break;
+    case 2:
+        ncnn::kanna_rotate_c2(src, srcw, srch, dst, dsw, dsh, type);
+        break;
+    case 3:
+        ncnn::kanna_rotate_c3(src, srcw, srch, dst, dsw, dsh, type);
+        break;
+    case 4:
+        ncnn::kanna_rotate_c4(src, srcw, srch, dst, dsw, dsh, type);
+        break;
+    }
     return;
 }
