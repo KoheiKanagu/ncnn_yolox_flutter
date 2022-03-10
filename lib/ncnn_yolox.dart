@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 
 typedef _KannaRotateNative = Void Function(
   Pointer<Uint8> src,
+  Int8 channel,
   Int32 srcw,
   Int32 srch,
   Pointer<Uint8> dst,
@@ -22,6 +23,7 @@ typedef _KannaRotateNative = Void Function(
 
 typedef _KannaRotate = void Function(
   Pointer<Uint8> src,
+  int channel,
   int srcw,
   int srch,
   Pointer<Uint8> dst,
@@ -59,12 +61,14 @@ typedef _Yuv420sp2rgb = void Function(
 
 typedef _DetectWithPixelsYoloxNative = Pointer<Utf8> Function(
   Pointer<Uint8> pixels,
+  Int32 pixelFormat,
   Int32 width,
   Int32 height,
 );
 
 typedef _DetectWithPixelsYolox = Pointer<Utf8> Function(
   Pointer<Uint8> pixels,
+  int pixelFormat,
   int width,
   int height,
 );
@@ -150,13 +154,15 @@ class NcnnYolox {
   /// When detecting from an image file, specify [imagePath].
   /// The [imagePath] should be the path to the image, such as "assets/image.jpg".
   ///
-  /// When detecting from an image byte array, specify [rgb], [height] and [width].
-  /// [rgb] is the RGB Image data. [width] and [height] specify the width and height of the Image.
+  /// When detecting from an image byte array, specify [pixels], [pixelFormat], [height] and [width].
+  /// [pixels] is pixel data of the image. [pixelFormat] is the pixel format.
+  /// [width] and [height] are the width and height of the image.
   ///
   /// Return a list of [YoloxResults].
   List<YoloxResults> detect({
     String? imagePath,
-    Uint8List? rgb,
+    Uint8List? pixels,
+    PixelFormat pixelFormat = PixelFormat.rgb,
     int? width,
     int? height,
   }) {
@@ -166,9 +172,10 @@ class NcnnYolox {
       );
     }
 
-    if (width != null && height != null && rgb != null) {
+    if (width != null && height != null && pixels != null) {
       return _detectWithPixels(
-        rgb: rgb,
+        pixels: pixels,
+        pixelFormat: pixelFormat,
         width: width,
         height: height,
       );
@@ -177,14 +184,16 @@ class NcnnYolox {
     return [];
   }
 
-  /// Reads an image from RGB pixel data and executes Detect.
+  /// Reads an image from pixel data and executes Detect.
   ///
-  /// [rgb] is the RGB Image data. [width] and [height] specify the width and height of the Image.
+  /// [pixels] is pixel data of the image. [pixelFormat] is the pixel format.
+  /// [width] and [height] are the width and height of the image.
   ///
   /// Returns a list of [YoloxResults]
   ///
   List<YoloxResults> _detectWithPixels({
-    required Uint8List rgb,
+    required Uint8List pixels,
+    PixelFormat pixelFormat = PixelFormat.rgb,
     required int width,
     required int height,
   }) {
@@ -193,20 +202,21 @@ class NcnnYolox {
       return [];
     }
 
-    final pixels = calloc.allocate<Uint8>(rgb.length);
+    final pixelsNative = calloc.allocate<Uint8>(pixels.length);
 
-    for (var i = 0; i < rgb.length; i++) {
-      pixels[i] = rgb[i];
+    for (var i = 0; i < pixels.length; i++) {
+      pixelsNative[i] = pixels[i];
     }
 
     final results = YoloxResults.create(
       _detectWithPixelsYoloxFunction!(
-        pixels,
+        pixelsNative,
+        pixelFormat.type,
         width,
         height,
       ).toDartString(),
     );
-    calloc.free(pixels);
+    calloc.free(pixelsNative);
     return results;
   }
 
@@ -349,8 +359,19 @@ class NcnnYolox {
     return results;
   }
 
+  /// Rotate the pixel to match the orientation of the device.
+  ///
+  /// [pixels] is Image pixel data.
+  /// [pixelChannel] is the number of channels of the image. For example, [PixelChannel.c3] for RGB or [PixelChannel.c4] for RGBA.
+  /// [width] and [height] specify the width and height of the Image.
+  /// [deviceOrientationType] is the orientation of the device.
+  /// [sensorOrientation] is the orientation of the sensor.
+  ///
+  /// Returns [KannaRotateResults] with the rotated pixels data.
+  ///
   KannaRotateResults kannaRotate({
-    required Uint8List rgb,
+    required Uint8List pixels,
+    PixelChannel pixelChannel = PixelChannel.c3,
     required int width,
     required int height,
     KannaRotateDeviceOrientationType deviceOrientationType =
@@ -360,7 +381,7 @@ class NcnnYolox {
     assert(_kannaRotateFunction != null, 'initYolox first');
     assert(width > 0, 'width is too small');
     assert(height > 0, 'height is too small');
-    assert(rgb.isNotEmpty, 'pixels is empty');
+    assert(pixels.isNotEmpty, 'pixels is empty');
     assert(sensorOrientation >= 0, 'sensorOrientation is too small');
     assert(sensorOrientation <= 360, 'sensorOrientation is too big');
     assert(sensorOrientation % 90 == 0, 'Only 0, 90, 180 or 270');
@@ -368,7 +389,7 @@ class NcnnYolox {
     if (_kannaRotateFunction == null ||
         width <= 0 ||
         height <= 0 ||
-        rgb.isEmpty ||
+        pixels.isEmpty ||
         sensorOrientation < 0 ||
         sensorOrientation > 360 ||
         sensorOrientation % 90 != 0) {
@@ -377,45 +398,57 @@ class NcnnYolox {
 
     var rotateType = KannaRotateType.deg0;
 
+    ///
+    /// I don't know why you only need iOS but it works.
+    /// Maybe related issue https://github.com/flutter/flutter/issues/94045
+    ///
     switch (deviceOrientationType) {
       case KannaRotateDeviceOrientationType.portraitUp:
         rotateType = KananaRotateTypeExtension.fromDegree(
-          (0 + sensorOrientation) % 360,
+          Platform.isIOS
+              ? (-90 + sensorOrientation) % 360
+              : (0 + sensorOrientation) % 360,
         );
         break;
       case KannaRotateDeviceOrientationType.landscapeRight:
         rotateType = KananaRotateTypeExtension.fromDegree(
-          (90 + sensorOrientation) % 360,
+          Platform.isIOS
+              ? (-90 + sensorOrientation) % 360
+              : (90 + sensorOrientation) % 360,
         );
         break;
       case KannaRotateDeviceOrientationType.portraitDown:
         rotateType = KananaRotateTypeExtension.fromDegree(
-          (180 + sensorOrientation) % 360,
+          Platform.isIOS
+              ? (-90 + sensorOrientation) % 360
+              : (180 + sensorOrientation) % 360,
         );
         break;
       case KannaRotateDeviceOrientationType.landscapeLeft:
         rotateType = KananaRotateTypeExtension.fromDegree(
-          (270 + sensorOrientation) % 360,
+          Platform.isIOS
+              ? (-90 + sensorOrientation) % 360
+              : (270 + sensorOrientation) % 360,
         );
         break;
     }
 
     if (rotateType == KannaRotateType.deg0) {
       return KannaRotateResults(
-        rgb,
+        pixels,
         width,
         height,
       );
     }
 
-    final src = calloc.allocate<Uint8>(rgb.length);
-    for (var i = 0; i < rgb.length; i++) {
-      src[i] = rgb[i];
+    final src = calloc.allocate<Uint8>(pixels.length);
+    for (var i = 0; i < pixels.length; i++) {
+      src[i] = pixels[i];
     }
     final srcw = width;
     final srch = height;
 
-    final dst = calloc.allocate<Uint8>(rgb.length);
+    final dst = calloc.allocate<Uint8>(pixels.length);
     var dstw = width;
     var dsth = height;
 
@@ -434,6 +467,7 @@ class NcnnYolox {
 
     _kannaRotateFunction!(
       src,
+      pixelChannel.channelNum,
       srcw,
       srch,
       dst,
@@ -442,7 +476,7 @@ class NcnnYolox {
       type,
     );
 
-    final results = _copyUint8PointerToUint8List(dst, rgb.length);
+    final results = _copyUint8PointerToUint8List(dst, pixels.length);
     calloc
       ..free(src)
       ..free(dst);
