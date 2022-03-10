@@ -265,9 +265,9 @@ extension DeviceOrientationExtension on DeviceOrientation {
       case DeviceOrientation.portraitDown:
         return KannaRotateDeviceOrientationType.portraitDown;
       case DeviceOrientation.landscapeLeft:
-        return KannaRotateDeviceOrientationType.landscapeRight;
-      case DeviceOrientation.landscapeRight:
         return KannaRotateDeviceOrientationType.landscapeLeft;
+      case DeviceOrientation.landscapeRight:
+        return KannaRotateDeviceOrientationType.landscapeRight;
     }
   }
 }
