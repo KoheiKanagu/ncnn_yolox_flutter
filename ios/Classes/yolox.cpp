@@ -341,7 +341,7 @@ static int detect_yolox_cv_mat(const cv::Mat &bgr, std::vector<Object> &objects)
 {
     int img_w = bgr.cols;
     int img_h = bgr.rows;
-    return detect_yolox(bgr.data, ncnn::Mat::PIXEL_BGR, img_w, img_w, objects);
+    return detect_yolox(bgr.data, ncnn::Mat::PIXEL_BGR, img_w, img_h, objects);
 }
 
 static int detect_yolox_pixels(const unsigned char *pixels, int img_w, int img_h, std::vector<Object> &objects)
