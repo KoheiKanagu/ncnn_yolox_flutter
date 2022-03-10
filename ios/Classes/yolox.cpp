@@ -257,7 +257,7 @@ static void generate_yolox_proposals(std::vector<GridAndStride> grid_strides, co
     } // point anchor loop
 }
 
-static int detect_yolox(unsigned char *pixels, int type, int img_w, int img_h, std::vector<Object> &objects)
+static int detect_yolox(const unsigned char *pixels, int type, int img_w, int img_h, std::vector<Object> &objects)
 {
     int w = img_w;
     int h = img_h;
@@ -344,7 +344,7 @@ static int detect_yolox_cv_mat(const cv::Mat &bgr, std::vector<Object> &objects)
     return detect_yolox(bgr.data, ncnn::Mat::PIXEL_BGR, img_w, img_w, objects);
 }
 
-static int detect_yolox_pixels(unsigned char *pixels, int img_w, int img_h, std::vector<Object> &objects)
+static int detect_yolox_pixels(const unsigned char *pixels, int img_w, int img_h, std::vector<Object> &objects)
 {
     // https://github.com/Tencent/ncnn/blob/master/docs/how-to-use-and-FAQ/FAQ-ncnn-produce-wrong-result.md#check-input-is-rgb-or-bgr
     return detect_yolox(pixels, ncnn::Mat::PIXEL_RGB2BGR, img_w, img_h, objects);
@@ -449,7 +449,7 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *de
     return parseResultsObjects(objects);
 }
 
-extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *detectWithPixels(unsigned char *pixels, int width, int height)
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *detectWithPixels(const unsigned char *pixels, int width, int height)
 {
     std::vector<Object> objects;
     detect_yolox_pixels(pixels, width, height, objects);
@@ -457,20 +457,20 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *de
     return parseResultsObjects(objects);
 }
 
-extern "C" __attribute__((visibility("default"))) __attribute__((used)) void yuv420sp2rgb(unsigned char *yuv420sp, int width, int height, unsigned char *rgb)
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) void yuv420sp2rgb(const unsigned char *yuv420sp, int width, int height, unsigned char *rgb)
 {
     ncnn::yuv420sp2rgb(yuv420sp, width, height, rgb);
     return;
 }
 
-extern "C" __attribute__((visibility("default"))) __attribute__((used)) void rgb2rgba(unsigned char *rgb, int width, int height, unsigned char *rgba)
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) void rgb2rgba(const unsigned char *rgb, int width, int height, unsigned char *rgba)
 {
     ncnn::Mat m = ncnn::Mat::from_pixels(rgb, ncnn::Mat::PIXEL_RGB2BGRA, width, height);
     m.to_pixels(rgba, ncnn::Mat::PIXEL_RGBA);
     return;
 }
 
-extern "C" __attribute__((visibility("default"))) __attribute__((used)) void kannaRotate(unsigned char *src, int srcw, int srch, unsigned char *dst, int dsw, int dsh, int type)
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) void kannaRotate(const unsigned char *src, int srcw, int srch, unsigned char *dst, int dsw, int dsh, int type)
 {
     ncnn::kanna_rotate_c3(src, srcw, srch, dst, dsw, dsh, type);
     return;
