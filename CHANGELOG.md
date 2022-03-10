@@ -1,3 +1,9 @@
+## 0.1.0
+
+- Can execute YOLOX on `Uint8List` pixel data.
+- Helper methods have been implemented to execute YOLOX on image streams.
+- Fixed a problem with object detection in the sample app.
+
 ## 0.0.7+1
 
 - README fixed
