@@ -79,7 +79,11 @@ Please check [example/lib](example/lib) for specific usage.
 
 See [build_ncnn.yaml](.github/workflows/build_ncnn.yaml) for details.
 
-If you want the pre-built ncnn, you can download it from Artifacts in [Actions](https://github.com/KoheiKanagu/ncnn_yolox_flutter/actions/workflows/build_ncnn.yaml).
+If you want pre-built ncnn, look at the URL of the Releases referenced in these files.
+Such as this `https://github.com/KoheiKanagu/ncnn_yolox_flutter/releases/download/x.y.z/ncnn-android.zip`
+
+- [android/CMakeLists.txt](https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/android/CMakeLists.txt)
+- [ios/ncnn_yolox_flutter.podspec](https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/ios/ncnn_yolox_flutter.podspec)
 
 ### 2. Download ncnn
 
