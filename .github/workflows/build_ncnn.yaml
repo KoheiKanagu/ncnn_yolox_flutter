@@ -19,50 +19,71 @@ jobs:
           git clone https://github.com/Tencent/ncnn.git -b $NCNN_VERSION --depth 1
           cd ncnn
           git submodule update --init
+      - name: cache-vulkansdk
+        id: cache-vulkansdk
+        uses: actions/cache@v2.1.7
+        with:
+          path: "1.2.189.0"
+          key: vulkansdk-linux-x86_64-1.2.189.0
+      - name: vulkansdk
+        if: steps.cache-vulkansdk.outputs.cache-hit != 'true'
+        run: |
+          wget https://sdk.lunarg.com/sdk/download/1.2.189.0/linux/vulkansdk-linux-x86_64-1.2.189.0.tar.gz?Human=true -O vulkansdk-linux-x86_64-1.2.189.0.tar.gz
+          tar -xf vulkansdk-linux-x86_64-1.2.189.0.tar.gz
+          rm -rf 1.2.189.0/source 1.2.189.0/samples
+          find 1.2.189.0 -type f | grep -v -E 'vulkan|glslang' | xargs rm
       - name: ndk-fix-debug
         run: sed -i -e '/^  -g$/d' $ANDROID_HOME/ndk-bundle/build/cmake/android.toolchain.cmake
       - name: build-armv7
         run: |
+          export PATH=`pwd`/1.2.189.0/x86_64/bin:$PATH
           cd ncnn
           mkdir build-armv7 && cd build-armv7
           cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_HOME/ndk-bundle/build/cmake/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DNCNN_VERSION_STRING="${{ needs.setup.outputs.VERSION }}" \
-              -DANDROID_ABI="armeabi-v7a" -DANDROID_ARM_NEON=ON -DANDROID_PLATFORM=android-14 \
+              -DANDROID_ABI="armeabi-v7a" -DANDROID_ARM_NEON=ON -DANDROID_PLATFORM=android-24 \
               -DNCNN_BUILD_BENCHMARK=OFF \
               -DNCNN_SIMPLEOCV=ON \
-              -DNCNN_DISABLE_RTTI=OFF ..
+              -DNCNN_DISABLE_RTTI=OFF \
+              -DNCNN_VULKAN=ON ..
           cmake --build . -j 2
           cmake --build . --target install
       - name: build-aarch64
         run: |
+          export PATH=`pwd`/1.2.189.0/x86_64/bin:$PATH
           cd ncnn
           mkdir build-aarch64 && cd build-aarch64
           cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_HOME/ndk-bundle/build/cmake/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DNCNN_VERSION_STRING="${{ needs.setup.outputs.VERSION }}" \
-              -DANDROID_ABI="arm64-v8a" -DANDROID_PLATFORM=android-21 \
+              -DANDROID_ABI="arm64-v8a" -DANDROID_PLATFORM=android-24 \
               -DNCNN_BUILD_BENCHMARK=OFF \
               -DNCNN_SIMPLEOCV=ON \
-              -DNCNN_DISABLE_RTTI=OFF ..
+              -DNCNN_DISABLE_RTTI=OFF \
+              -DNCNN_VULKAN=ON ..
           cmake --build . -j 2
           cmake --build . --target install
       - name: build-x86
         run: |
+          export PATH=`pwd`/1.2.189.0/x86_64/bin:$PATH
           cd ncnn
           mkdir build-x86 && cd build-x86
           cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_HOME/ndk-bundle/build/cmake/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DNCNN_VERSION_STRING="${{ needs.setup.outputs.VERSION }}" \
-              -DANDROID_ABI="x86" -DANDROID_PLATFORM=android-14 \
+              -DANDROID_ABI="x86" -DANDROID_PLATFORM=android-24 \
               -DNCNN_BUILD_BENCHMARK=OFF \
               -DNCNN_SIMPLEOCV=ON \
-              -DNCNN_DISABLE_RTTI=OFF ..
+              -DNCNN_DISABLE_RTTI=OFF \
+              -DNCNN_VULKAN=ON ..
           cmake --build . -j 2
           cmake --build . --target install
       - name: build-x86_64
         run: |
+          export PATH=`pwd`/1.2.189.0/x86_64/bin:$PATH
           cd ncnn
           mkdir build-x86_64 && cd build-x86_64
           cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_HOME/ndk-bundle/build/cmake/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DNCNN_VERSION_STRING="${{ needs.setup.outputs.VERSION }}" \
-              -DANDROID_ABI="x86_64" -DANDROID_PLATFORM=android-21 \
+              -DANDROID_ABI="x86_64" -DANDROID_PLATFORM=android-24 \
               -DNCNN_BUILD_BENCHMARK=OFF \
               -DNCNN_SIMPLEOCV=ON \
-              -DNCNN_DISABLE_RTTI=OFF ..
+              -DNCNN_DISABLE_RTTI=OFF \
+              -DNCNN_VULKAN=ON ..
           cmake --build . -j 2
           cmake --build . --target install
 
@@ -169,8 +190,15 @@ jobs:
           sudo cp openmp-ios-bitcode/lib/libomp.a $DEVELOPER_DIR/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/lib
           sudo cp openmp-ios-bitcode/include/* $DEVELOPER_DIR/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/usr/include
           sudo cp openmp-ios-bitcode/lib/libomp.a $DEVELOPER_DIR/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/usr/lib
+      - name: vulkansdk
+        run: |
+          wget https://sdk.lunarg.com/sdk/download/1.2.189.0/mac/vulkansdk-macos-1.2.189.0.dmg?Human=true -O vulkansdk-macos-1.2.189.0.dmg
+          hdiutil attach vulkansdk-macos-1.2.189.0.dmg
+          sudo /Volumes/vulkansdk-macos-1.2.189.0/InstallVulkan.app/Contents/MacOS/InstallVulkan --root $GITHUB_WORKSPACE/vulkansdk-macos-1.2.189.0 --accept-licenses --default-answer --confirm-command install
+          hdiutil detach /Volumes/vulkansdk-macos-1.2.189.0
       - name: build
         run: |
+          export VULKAN_SDK=$GITHUB_WORKSPACE/vulkansdk-macos-1.2.189.0/macOS
           cd ncnn
           mkdir build && cd build
           cmake -DCMAKE_TOOLCHAIN_FILE=../toolchains/ios.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DNCNN_VERSION_STRING="${{ needs.setup.outputs.VERSION }}" \
@@ -178,13 +206,17 @@ jobs:
               -DOpenMP_C_FLAGS="-Xclang -fopenmp" -DOpenMP_CXX_FLAGS="-Xclang -fopenmp" \
               -DOpenMP_C_LIB_NAMES="libomp" -DOpenMP_CXX_LIB_NAMES="libomp" \
               -DOpenMP_libomp_LIBRARY="$DEVELOPER_DIR/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/lib/libomp.a" \
+              -DVulkan_INCLUDE_DIR=$GITHUB_WORKSPACE/vulkansdk-macos-1.2.189.0/MoltenVK/include \
+              -DVulkan_LIBRARY=$GITHUB_WORKSPACE/vulkansdk-macos-1.2.189.0/MoltenVK/iOS/dynamic/libMoltenVK.dylib \
               -DNCNN_BUILD_BENCHMARK=OFF \
               -DNCNN_SIMPLEOCV=ON \
-              -DNCNN_DISABLE_RTTI=OFF ..
+              -DNCNN_DISABLE_RTTI=OFF \
+              -DNCNN_VULKAN=ON ..
           cmake --build . -j 3
           cmake --build . --target install
       - name: build-simulator
         run: |
+          export VULKAN_SDK=$GITHUB_WORKSPACE/vulkansdk-macos-1.2.189.0/macOS
           cd ncnn
           mkdir build-simulator && cd build-simulator
           cmake -DCMAKE_TOOLCHAIN_FILE=../toolchains/ios.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DNCNN_VERSION_STRING="${{ needs.setup.outputs.VERSION }}" \
@@ -192,9 +224,12 @@ jobs:
               -DOpenMP_C_FLAGS="-Xclang -fopenmp" -DOpenMP_CXX_FLAGS="-Xclang -fopenmp" \
               -DOpenMP_C_LIB_NAMES="libomp" -DOpenMP_CXX_LIB_NAMES="libomp" \
               -DOpenMP_libomp_LIBRARY="$DEVELOPER_DIR/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/usr/lib/libomp.a" \
+              -DVulkan_INCLUDE_DIR=$GITHUB_WORKSPACE/vulkansdk-macos-1.2.189.0/MoltenVK/include \
+              -DVulkan_LIBRARY=$GITHUB_WORKSPACE/vulkansdk-macos-1.2.189.0/MoltenVK/iOS/dynamic/libMoltenVK.dylib \
               -DNCNN_BUILD_BENCHMARK=OFF \
               -DNCNN_SIMPLEOCV=ON \
-              -DNCNN_DISABLE_RTTI=OFF ..
+              -DNCNN_DISABLE_RTTI=OFF \
+              -DNCNN_VULKAN=ON ..
           cmake --build . -j 3
           cmake --build . --target install
       - name: package-openmp
@@ -210,6 +245,21 @@ jobs:
           cp ../openmp-ios-bitcode/lib/libomp.a openmp.framework/Versions/A/openmp
           cp -r ../openmp-ios-bitcode/include/* openmp.framework/Versions/A/Headers/
           sed -e 's/__NAME__/openmp/g' -e 's/__IDENTIFIER__/org.llvm.openmp/g' -e 's/__VERSION__/11.0/g' Info.plist > openmp.framework/Versions/A/Resources/Info.plist
+      - name: package-glslang
+        run: |
+          cd ncnn
+          rm -rf glslang.framework
+          mkdir -p glslang.framework/Versions/A/Headers
+          mkdir -p glslang.framework/Versions/A/Resources
+          ln -s A glslang.framework/Versions/Current
+          ln -s Versions/Current/Headers glslang.framework/Headers
+          ln -s Versions/Current/Resources glslang.framework/Resources
+          ln -s Versions/Current/glslang glslang.framework/glslang
+          libtool -static build/install/lib/libglslang.a build/install/lib/libMachineIndependent.a build/install/lib/libGenericCodeGen.a build/install/lib/libSPIRV.a build/install/lib/libOGLCompiler.a build/install/lib/libOSDependent.a -o build/install/lib/libglslang_combined.a
+          libtool -static build-simulator/install/lib/libglslang.a build-simulator/install/lib/libMachineIndependent.a build-simulator/install/lib/libGenericCodeGen.a build-simulator/install/lib/libSPIRV.a build-simulator/install/lib/libOGLCompiler.a build-simulator/install/lib/libOSDependent.a -o build-simulator/install/lib/libglslang_combined.a
+          lipo -create build/install/lib/libglslang_combined.a build-simulator/install/lib/libglslang_combined.a -o glslang.framework/Versions/A/glslang
+          cp -r build/install/include/glslang glslang.framework/Versions/A/Headers/
+          sed -e 's/__NAME__/glslang/g' -e 's/__IDENTIFIER__/org.khronos.glslang/g' -e 's/__VERSION__/1.0/g' Info.plist > glslang.framework/Versions/A/Resources/Info.plist
       - name: package
         run: |
           cd ncnn
@@ -224,7 +274,7 @@ jobs:
           cp -r build/install/include/* ncnn.framework/Versions/A/Headers/
           sed -e 's/__NAME__/ncnn/g' -e 's/__IDENTIFIER__/com.tencent.ncnn/g' -e 's/__VERSION__/1.0/g' Info.plist > ncnn.framework/Versions/A/Resources/Info.plist
           rm -f ${{ env.PACKAGENAME }}.zip
-          zip -9 -y -r ${{ env.PACKAGENAME }}.zip openmp.framework ncnn.framework
+          zip -9 -y -r ${{ env.PACKAGENAME }}.zip openmp.framework glslang.framework ncnn.framework
 
       - name: upload-zip
         uses: actions/upload-artifact@v2
@@ -290,7 +340,34 @@ jobs:
               -framework openmp/simulator/openmp.framework \
               -output "openmp.xcframework"
 
-          zip -9 -y -r ${{ env.PACKAGENAME }}_xcframework.zip openmp.xcframework ncnn.xcframework
+          rm -rf glslang
+          rm -rf glslang.xcframework
+
+          mkdir glslang
+
+          mkdir glslang/ios
+          cp -R glslang.framework/ glslang/ios/glslang.framework
+
+          lipo \
+              -extract "arm64" \
+              -extract "arm64e" \
+              glslang/ios/glslang.framework/Versions/A/glslang \
+              -o glslang/ios/glslang.framework/Versions/A/glslang
+
+          mkdir glslang/simulator
+          cp -R glslang.framework/ glslang/simulator/glslang.framework
+
+          lipo \
+              -extract "x86_64" \
+              glslang/simulator/glslang.framework/Versions/A/glslang \
+              -o glslang/simulator/glslang.framework/Versions/A/glslang
+
+          xcodebuild -create-xcframework \
+              -framework glslang/ios/glslang.framework \
+              -framework glslang/simulator/glslang.framework \
+              -output "glslang.xcframework"
+
+          zip -9 -y -r ${{ env.PACKAGENAME }}_xcframework.zip openmp.xcframework glslang.xcframework ncnn.xcframework
 
       - name: upload-zip
         uses: actions/upload-artifact@v2
