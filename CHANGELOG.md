@@ -1,3 +1,7 @@
+## 0.1.2
+
+- Fixed to initialize dynamicLibrary lookupFunction in the constructor.
+
 ## 0.1.1
 
 - Fixed orientation of preview image in example app.
