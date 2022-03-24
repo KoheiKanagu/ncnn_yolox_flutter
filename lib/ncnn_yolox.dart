@@ -91,25 +91,7 @@ typedef _InitYolox = void Function(
 );
 
 class NcnnYolox {
-  final dynamicLibrary = Platform.isAndroid
-      ? DynamicLibrary.open('libncnn_yolox_flutter.so')
-      : DynamicLibrary.process();
-
-  _DetectWithImagePathYolox? _detectWithImagePathYoloxFunction;
-  _DetectWithPixelsYolox? _detectWithPixelsYoloxFunction;
-  _Yuv420sp2rgb? _yuv420sp2rgbFunction;
-  _Rgb2rgba? _rgb2rgbaFunction;
-  _KannaRotate? _kannaRotateFunction;
-
-  /// Initialize YoloX
-  /// Run it for the first time
-  ///
-  /// - [modelPath] - path to model file. like "assets/yolox.bin"
-  /// - [paramPath] - path to parameter file. like "assets/yolox.param"
-  Future<void> initYolox({
-    required String modelPath,
-    required String paramPath,
-  }) async {
+  NcnnYolox() {
     _detectWithImagePathYoloxFunction = dynamicLibrary.lookupFunction<
         _DetectWithImagePathYoloxNative,
         _DetectWithImagePathYolox>('detectWithImagePath');
@@ -122,10 +104,34 @@ class NcnnYolox {
         dynamicLibrary.lookupFunction<_Rgb2rgbaNative, _Rgb2rgba>('rgb2rgba');
     _kannaRotateFunction = dynamicLibrary
         .lookupFunction<_KannaRotateNative, _KannaRotate>('kannaRotate');
+    _initYoloxFunction = dynamicLibrary
+        .lookupFunction<_InitYoloxNative, _InitYolox>('initYolox');
+  }
 
+  final dynamicLibrary = Platform.isAndroid
+      ? DynamicLibrary.open('libncnn_yolox_flutter.so')
+      : DynamicLibrary.process();
+
+  late _DetectWithImagePathYolox _detectWithImagePathYoloxFunction;
+  late _DetectWithPixelsYolox _detectWithPixelsYoloxFunction;
+  late _Yuv420sp2rgb _yuv420sp2rgbFunction;
+  late _Rgb2rgba _rgb2rgbaFunction;
+  late _KannaRotate _kannaRotateFunction;
+  late _InitYolox _initYoloxFunction;
+
+  /// Initialize YoloX
+  /// Run it for the first time
+  ///
+  /// - [modelPath] - path to model file. like "assets/yolox.bin"
+  /// - [paramPath] - path to parameter file. like "assets/yolox.param"
+  Future<void> initYolox({
+    required String modelPath,
+    required String paramPath,
+  }) async {
     final tempModelPath = (await _copy(modelPath)).toNativeUtf8();
     final tempParamPath = (await _copy(paramPath)).toNativeUtf8();
-    dynamicLibrary.lookupFunction<_InitYoloxNative, _InitYolox>('initYolox')(
+
+    _initYoloxFunction(
       tempModelPath,
       tempParamPath,
     );
@@ -199,11 +205,6 @@ class NcnnYolox {
     required int width,
     required int height,
   }) {
-    assert(_detectWithPixelsYoloxFunction != null, 'initYolox first');
-    if (_detectWithPixelsYoloxFunction == null) {
-      return [];
-    }
-
     final pixelsNative = calloc.allocate<Uint8>(pixels.length);
 
     for (var i = 0; i < pixels.length; i++) {
@@ -211,7 +212,7 @@ class NcnnYolox {
     }
 
     final results = YoloxResults.create(
-      _detectWithPixelsYoloxFunction!(
+      _detectWithPixelsYoloxFunction(
         pixelsNative,
         pixelFormat.type,
         width,
@@ -230,17 +231,16 @@ class NcnnYolox {
   List<YoloxResults> _detectWithImagePath({
     required String imagePath,
   }) {
-    assert(_detectWithImagePathYoloxFunction != null, 'initYolox first');
     assert(imagePath.isNotEmpty, 'imagePath is empty');
 
-    if (_detectWithImagePathYoloxFunction == null || imagePath.isEmpty) {
+    if (imagePath.isEmpty) {
       return [];
     }
 
     final imagePathNative = imagePath.toNativeUtf8();
 
     final results = YoloxResults.create(
-      _detectWithImagePathYoloxFunction!(
+      _detectWithImagePathYoloxFunction(
         imagePathNative,
       ).toDartString(),
     );
@@ -288,15 +288,11 @@ class NcnnYolox {
     required int width,
     required int height,
   }) {
-    assert(_yuv420sp2rgbFunction != null, 'initYolox first');
     assert(width > 0, 'width is too small');
     assert(height > 0, 'height is too small');
     assert(yuv420sp.isNotEmpty, 'yuv420sp is empty');
 
-    if (_yuv420sp2rgbFunction == null ||
-        width <= 0 ||
-        height <= 0 ||
-        yuv420sp.isEmpty) {
+    if (width <= 0 || height <= 0 || yuv420sp.isEmpty) {
       return Uint8List(0);
     }
 
@@ -307,7 +303,7 @@ class NcnnYolox {
 
     final rgb = calloc.allocate<Uint8>(width * height * 3);
 
-    _yuv420sp2rgbFunction!(
+    _yuv420sp2rgbFunction(
       pixels,
       width,
       height,
@@ -331,12 +327,11 @@ class NcnnYolox {
     required int width,
     required int height,
   }) {
-    assert(_rgb2rgbaFunction != null, 'initYolox first');
     assert(width > 0, 'width is too small');
     assert(height > 0, 'height is too small');
     assert(rgb.isNotEmpty, 'pixels is empty');
 
-    if (_rgb2rgbaFunction == null || width <= 0 || height <= 0 || rgb.isEmpty) {
+    if (width <= 0 || height <= 0 || rgb.isEmpty) {
       return Uint8List(0);
     }
 
@@ -347,7 +342,7 @@ class NcnnYolox {
 
     final rgba = calloc.allocate<Uint8>(width * height * 4);
 
-    _rgb2rgbaFunction!(
+    _rgb2rgbaFunction(
       pixels,
       width,
       height,
@@ -380,7 +375,6 @@ class NcnnYolox {
         KannaRotateDeviceOrientationType.portraitUp,
     int sensorOrientation = 90,
   }) {
-    assert(_kannaRotateFunction != null, 'initYolox first');
     assert(width > 0, 'width is too small');
     assert(height > 0, 'height is too small');
     assert(pixels.isNotEmpty, 'pixels is empty');
@@ -388,8 +382,7 @@ class NcnnYolox {
     assert(sensorOrientation <= 360, 'sensorOrientation is too big');
     assert(sensorOrientation % 90 == 0, 'Only 0, 90, 180 or 270');
 
-    if (_kannaRotateFunction == null ||
-        width <= 0 ||
+    if (width <= 0 ||
         height <= 0 ||
         pixels.isEmpty ||
         sensorOrientation < 0 ||
@@ -467,7 +460,7 @@ class NcnnYolox {
 
     final type = rotateType.type;
 
-    _kannaRotateFunction!(
+    _kannaRotateFunction(
       src,
       pixelChannel.channelNum,
       srcw,
