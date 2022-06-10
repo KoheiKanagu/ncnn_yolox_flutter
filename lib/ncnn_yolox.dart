@@ -433,6 +433,7 @@ class NcnnYolox {
         pixels,
         width,
         height,
+        pixelChannel,
       );
     }
 
@@ -480,6 +481,7 @@ class NcnnYolox {
       results,
       dstw,
       dsth,
+      pixelChannel,
     );
   }
 
