@@ -29,7 +29,7 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         uses: actions/cache@v2
         with:
-          path: ./ios/Pods
+          path: ./example/ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}-v1
           restore-keys: |
             ${{ runner.os }}-pods-
