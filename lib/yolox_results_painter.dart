@@ -59,9 +59,7 @@ class YoloxResultsPainter extends CustomPainter {
         ),
         textDirection: ui.TextDirection.ltr,
       )
-        ..layout(
-          minWidth: 0,
-        )
+        ..layout()
         ..paint(
           canvas,
           Offset(

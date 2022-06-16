@@ -1,8 +1,8 @@
 PODS:
-  - camera (0.0.1):
+  - camera_avfoundation (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - image_picker (0.0.1):
+  - image_picker_ios (0.0.1):
     - Flutter
   - ncnn_yolox_flutter (0.0.1):
     - Flutter
@@ -10,31 +10,31 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
-  - camera (from `.symlinks/plugins/camera/ios`)
+  - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - Flutter (from `Flutter`)
-  - image_picker (from `.symlinks/plugins/image_picker/ios`)
+  - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - ncnn_yolox_flutter (from `.symlinks/plugins/ncnn_yolox_flutter/ios`)
   - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
 
 EXTERNAL SOURCES:
-  camera:
-    :path: ".symlinks/plugins/camera/ios"
+  camera_avfoundation:
+    :path: ".symlinks/plugins/camera_avfoundation/ios"
   Flutter:
     :path: Flutter
-  image_picker:
-    :path: ".symlinks/plugins/image_picker/ios"
+  image_picker_ios:
+    :path: ".symlinks/plugins/image_picker_ios/ios"
   ncnn_yolox_flutter:
     :path: ".symlinks/plugins/ncnn_yolox_flutter/ios"
   path_provider_ios:
     :path: ".symlinks/plugins/path_provider_ios/ios"
 
 SPEC CHECKSUMS:
-  camera: 9993f92f2c793e87b65e35f3a23c70582afb05b1
+  camera_avfoundation: 07c77549ea54ad95d8581be86617c094a46280d9
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  image_picker: 541dcbb3b9cf32d87eacbd957845d8651d6c62c3
+  image_picker_ios: b786a5dcf033a8336a657191401bfdf12017dabb
   ncnn_yolox_flutter: b8eb17be94717eaa9d86eaee03cff63d641b1667
-  path_provider_ios: 7d7ce634493af4477d156294792024ec3485acd5
+  path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
 
-PODFILE CHECKSUM: ce3bb8803deeed6828d80f9dcbd79d554a762fe2
+PODFILE CHECKSUM: bb7a046258a98418a605d21813d1432adbd019e9
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3
