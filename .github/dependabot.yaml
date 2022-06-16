@@ -7,7 +7,7 @@ updates:
       interval: "daily"
     open-pull-requests-limit: 10
 
-  - package-ecosystem: "pub example"
+  - package-ecosystem: "pub"
     directory: "example"
     schedule:
       interval: "daily"
