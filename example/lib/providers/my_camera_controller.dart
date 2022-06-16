@@ -52,11 +52,10 @@ class MyCameraController {
     if (cameraValue != null) {
       if (cameraValue.isInitialized && cameraValue.isStreamingImages) {
         await _cameraController?.stopImageStream();
+        await _cameraController?.dispose();
+        _cameraController = null;
       }
     }
-
-    await _cameraController?.dispose();
-    _cameraController = null;
   }
 }
 
