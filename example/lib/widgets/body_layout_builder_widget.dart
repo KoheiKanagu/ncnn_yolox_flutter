@@ -5,11 +5,11 @@ import 'package:ncnn_yolox_flutter/ncnn_yolox_flutter.dart';
 
 class BodyLayoutBuilderWidget extends StatelessWidget {
   const BodyLayoutBuilderWidget({
-    Key? key,
+    super.key,
     this.previewImage,
     required this.results,
     required this.labels,
-  }) : super(key: key);
+  });
 
   final ui.Image? previewImage;
 

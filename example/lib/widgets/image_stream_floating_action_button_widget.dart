@@ -9,10 +9,10 @@ import 'package:ncnn_yolox_flutter/ncnn_yolox_flutter.dart';
 
 class ImageStreamFloatingActionButtonWidget extends StatefulWidget {
   const ImageStreamFloatingActionButtonWidget({
-    Key? key,
+    super.key,
     required this.ncnn,
     required this.onDetected,
-  }) : super(key: key);
+  });
 
   final NcnnYolox ncnn;
 
@@ -38,14 +38,14 @@ class _VideoStreamFloatingActionButtonState
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     super.dispose();
     cameraController?.dispose();
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
   }
 
   @override
@@ -139,7 +139,6 @@ class _VideoStreamFloatingActionButtonState
     final stopwatchKannaRotate = Stopwatch()..start();
     final rotated = widget.ncnn.kannaRotate(
       pixels: pixels,
-      pixelChannel: PixelChannel.c3,
       width: image.width,
       height: image.height,
       deviceOrientationType: deviceOrientationType,
@@ -158,7 +157,6 @@ class _VideoStreamFloatingActionButtonState
     final stopwatchDetect = Stopwatch()..start();
     final results = widget.ncnn.detect(
       pixels: rotated.pixels,
-      pixelFormat: PixelFormat.rgb,
       width: rotated.width,
       height: rotated.height,
     );

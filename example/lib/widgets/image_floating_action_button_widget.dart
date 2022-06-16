@@ -7,11 +7,11 @@ import 'package:ncnn_yolox_flutter/ncnn_yolox_flutter.dart';
 
 class ImageFloatingActionButtonWidget extends StatelessWidget {
   const ImageFloatingActionButtonWidget({
-    Key? key,
+    super.key,
     required this.imageSource,
     required this.ncnn,
     required this.onDetected,
-  }) : super(key: key);
+  });
 
   final ImageSource imageSource;
 
@@ -35,7 +35,7 @@ class ImageFloatingActionButtonWidget extends StatelessWidget {
         );
 
         final pixels = (await decodedImage.toByteData(
-          format: ui.ImageByteFormat.rawRgba,
+          
         ))!
             .buffer
             .asUint8List();
