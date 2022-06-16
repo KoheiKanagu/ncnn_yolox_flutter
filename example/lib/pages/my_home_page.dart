@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ncnn_yolox_flutter_example/pages/preview_page.dart';
+import 'package:ncnn_yolox_flutter_example/providers/my_camera_controller.dart';
 import 'package:ncnn_yolox_flutter_example/providers/ncnn_yolox_controller.dart';
 
 class MyHomePage extends HookConsumerWidget {
@@ -57,7 +58,15 @@ class MyHomePage extends HookConsumerWidget {
           ),
           ListTile(
             title: const Text('from camera stream'),
-            onTap: () {},
+            onTap: () {
+              ref.read(myCameraController).startImageStream();
+
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const PreviewPage(),
+                ),
+              );
+            },
           ),
         ],
       ),

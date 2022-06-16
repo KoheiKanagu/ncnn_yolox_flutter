@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:ncnn_yolox_flutter_example/app_lifecycle_observer.dart';
 import 'package:ncnn_yolox_flutter_example/pages/my_home_page.dart';
 
 Future<void> main() async {
@@ -12,19 +13,22 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends HookConsumerWidget {
   const MyApp({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(),
+      navigatorObservers: [
+        ref.watch(appLifecycleObserver),
+      ],
     );
   }
 }
