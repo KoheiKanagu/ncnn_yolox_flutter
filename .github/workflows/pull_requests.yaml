@@ -1,0 +1,53 @@
+name: Pull Requests
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+env:
+  FLUTTER_VERSION: "3.0.2" # FIXME
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        include:
+          - os: macos-latest
+            build_script: .github/workflows/scripts/build_ios.sh
+
+          - os: ubuntu-latest
+            build_script: .github/workflows/scripts/build_android.sh
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      ### Setup ###
+      - uses: actions/checkout@v3
+
+      - name: CocoaPods Cache
+        if: ${{ runner.os == 'macOS' }}
+        uses: actions/cache@v2
+        with:
+          path: ./ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: Gradle Cache
+        if: ${{ runner.os == 'linux' }}
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: "Install Flutter"
+        run: ./.github/workflows/scripts/install-flutter.sh $FLUTTER_VERSION
+
+      ### Build ###
+      - name: Build
+        run: ${{ matrix.build_script }}
