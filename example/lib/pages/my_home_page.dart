@@ -18,43 +18,19 @@ class MyHomePage extends HookConsumerWidget {
         children: [
           ListTile(
             title: const Text('from gallery image'),
-            onTap: () async {
-              final navigator = Navigator.of(context);
-
-              final file =
-                  await ImagePicker().pickImage(source: ImageSource.gallery);
-              if (file != null) {
-                await ref
-                    .read(ncnnYoloxController.notifier)
-                    .detectFromImageFile(file);
-
-                await navigator.push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const PreviewPage(),
-                  ),
-                );
-              }
-            },
+            onTap: () => _pickImage(
+              context,
+              ref.read,
+              ImageSource.gallery,
+            ),
           ),
           ListTile(
             title: const Text('from camera image'),
-            onTap: () async {
-              final navigator = Navigator.of(context);
-
-              final file =
-                  await ImagePicker().pickImage(source: ImageSource.camera);
-              if (file != null) {
-                await ref
-                    .read(ncnnYoloxController.notifier)
-                    .detectFromImageFile(file);
-
-                await navigator.push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const PreviewPage(),
-                  ),
-                );
-              }
-            },
+            onTap: () => _pickImage(
+              context,
+              ref.read,
+              ImageSource.camera,
+            ),
           ),
           ListTile(
             title: const Text('from camera stream'),
@@ -71,5 +47,26 @@ class MyHomePage extends HookConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _pickImage(
+    BuildContext context,
+    Reader read,
+    ImageSource imageSource,
+  ) async {
+    final navigator = Navigator.of(context);
+
+    final file = await ImagePicker().pickImage(source: imageSource);
+    if (file != null) {
+      final controller = read(ncnnYoloxController.notifier);
+      await controller.initialize();
+      await controller.detectFromImageFile(file);
+
+      await navigator.push(
+        MaterialPageRoute<void>(
+          builder: (_) => const PreviewPage(),
+        ),
+      );
+    }
   }
 }

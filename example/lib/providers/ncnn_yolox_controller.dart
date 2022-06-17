@@ -26,7 +26,7 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
     (_) => null,
   );
 
-  Future<void> _initialize() async {
+  Future<void> initialize() async {
     await _ncnnYolox.initYolox(
       modelPath: 'assets/yolox/yolox.bin',
       paramPath: 'assets/yolox/yolox.param',
@@ -34,8 +34,6 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
   }
 
   Future<void> detectFromImageFile(XFile file) async {
-    await _initialize();
-
     final decodedImage = await decodeImageFromList(
       File(
         file.path,
@@ -55,8 +53,6 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
   }
 
   Future<void> detectFromCameraImage(CameraImage cameraImage) async {
-    await _initialize();
-
     switch (cameraImage.format.group) {
       case ImageFormatGroup.unknown:
       case ImageFormatGroup.jpeg:

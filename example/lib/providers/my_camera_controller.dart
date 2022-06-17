@@ -25,6 +25,8 @@ class MyCameraController {
   bool _isProcessing = false;
 
   Future<void> startImageStream() async {
+    await _read(ncnnYoloxController.notifier).initialize();
+
     final camera = (await availableCameras())[0];
 
     _cameraController = CameraController(
