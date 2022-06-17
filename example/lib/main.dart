@@ -1,54 +1,39 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:ncnn_yolox_flutter/ncnn_yolox_flutter.dart';
-import 'package:ncnn_yolox_flutter_example/widgets/body_layout_builder_widget.dart';
-import 'package:ncnn_yolox_flutter_example/widgets/image_floating_action_button_widget.dart';
-import 'package:ncnn_yolox_flutter_example/widgets/image_stream_floating_action_button_widget.dart';
-
-final ncnn = NcnnYolox();
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:ncnn_yolox_flutter_example/app_lifecycle_observer.dart';
+import 'package:ncnn_yolox_flutter_example/pages/my_home_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await ncnn.initYolox(
-    modelPath: 'assets/yolox/yolox.bin',
-    paramPath: 'assets/yolox/yolox.param',
-  );
-
   runApp(
-    const MyApp(),
+    const ProviderScope(
+      child: MyApp(),
+    ),
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends HookConsumerWidget {
   const MyApp({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(),
+      navigatorObservers: [
+        ref.watch(appLifecycleObserver),
+      ],
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({
-    super.key,
-  });
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-final List<String> _labels = [
+final cocoLabels = [
   'person',
   'bicycle',
   'car',
@@ -130,62 +115,3 @@ final List<String> _labels = [
   'hair drier',
   'toothbrush'
 ];
-
-class _MyHomePageState extends State<MyHomePage> {
-  ui.Image? _previewImage;
-
-  List<YoloxResults> _yoloxResults = [];
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    void _setResultsState(
-      List<YoloxResults> results,
-      ui.Image image,
-    ) {
-      setState(() {
-        _yoloxResults = results;
-        _previewImage = image;
-      });
-    }
-
-    return Scaffold(
-      appBar: AppBar(),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          ImageStreamFloatingActionButtonWidget(
-            ncnn: ncnn,
-            onDetected: _setResultsState,
-          ),
-          const SizedBox(height: 24),
-          ImageFloatingActionButtonWidget(
-            imageSource: ImageSource.camera,
-            ncnn: ncnn,
-            onDetected: _setResultsState,
-          ),
-          const SizedBox(height: 24),
-          ImageFloatingActionButtonWidget(
-            imageSource: ImageSource.gallery,
-            ncnn: ncnn,
-            onDetected: _setResultsState,
-          ),
-        ],
-      ),
-      body: BodyLayoutBuilderWidget(
-        previewImage: _previewImage,
-        results: _yoloxResults,
-        labels: _labels,
-      ),
-    );
-  }
-}
