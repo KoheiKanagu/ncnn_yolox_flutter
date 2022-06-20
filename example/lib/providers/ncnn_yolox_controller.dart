@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:camera/camera.dart';
@@ -104,7 +105,7 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
 
     final stopwatchDecodeImageFromPixels = Stopwatch()..start();
     ui.decodeImageFromPixels(
-      rotated.pixels,
+      rotated.pixels ?? Uint8List(0),
       rotated.width,
       rotated.height,
       ui.PixelFormat.bgra8888,
@@ -167,7 +168,7 @@ FPS: ${1000 / sumMs}
 
     final stopwatchRgb2rgba = Stopwatch()..start();
     final rgba = _ncnnYolox.rgb2rgba(
-      rgb: rotated.pixels,
+      rgb: rotated.pixels ?? Uint8List(0),
       width: rotated.width,
       height: rotated.height,
     );

@@ -1,24 +1,16 @@
 import 'dart:typed_data';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:ncnn_yolox_flutter/models/models.dart';
 
-class KannaRotateResults {
-  KannaRotateResults(
-    this.pixels,
-    this.width,
-    this.height,
-    this.pixelChannel,
-  );
+part 'kanna_rotate_results.freezed.dart';
 
-  factory KannaRotateResults.empty() => KannaRotateResults(
-        Uint8List(0),
-        0,
-        0,
-        PixelChannel.c1,
-      );
-
-  late final Uint8List pixels;
-  late final int width;
-  late final int height;
-  final PixelChannel pixelChannel;
+@freezed
+class KannaRotateResults with _$KannaRotateResults {
+  const factory KannaRotateResults({
+    Uint8List? pixels,
+    @Default(0) int width,
+    @Default(0) int height,
+    @Default(PixelChannel.c1) PixelChannel pixelChannel,
+  }) = _KannaRotateResults;
 }

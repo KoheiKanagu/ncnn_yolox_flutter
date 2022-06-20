@@ -1,21 +1,17 @@
-// ignore_for_file: lines_longer_than_80_chars
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class YoloxResults {
-  YoloxResults(
-    this.x,
-    this.y,
-    this.width,
-    this.height,
-    this.label,
-    this.prob,
-  );
+part 'yolox_results.freezed.dart';
 
-  final double x;
-  final double y;
-  final double width;
-  final double height;
-  final int label;
-  final double prob;
+@freezed
+class YoloxResults with _$YoloxResults {
+  const factory YoloxResults({
+    @Default(0) double x,
+    @Default(0) double y,
+    @Default(0) double width,
+    @Default(0) double height,
+    @Default(0) int label,
+    @Default(0) double prob,
+  }) = _YoloxResults;
 
   static List<YoloxResults> create(String response) => response
           .split('\n')
@@ -26,17 +22,13 @@ class YoloxResults {
         (e) {
           final values = e.split(',');
           return YoloxResults(
-            double.parse(values[0]),
-            double.parse(values[1]),
-            double.parse(values[2]),
-            double.parse(values[3]),
-            int.parse(values[4]),
-            double.parse(values[5]),
+            x: double.parse(values[0]),
+            y: double.parse(values[1]),
+            width: double.parse(values[2]),
+            height: double.parse(values[3]),
+            label: int.parse(values[4]),
+            prob: double.parse(values[5]),
           );
         },
       ).toList();
-
-  @override
-  String toString() =>
-      'YoloxResults{x: $x, y: $y, width: $width, height: $height, label: $label, prob: $prob}';
 }

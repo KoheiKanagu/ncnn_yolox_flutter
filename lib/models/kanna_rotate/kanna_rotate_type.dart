@@ -1,24 +1,14 @@
 enum KannaRotateType {
-  deg0,
-  deg90,
-  deg180,
-  deg270,
-}
+  deg0(1),
+  deg90(6),
+  deg180(3),
+  deg270(8),
+  ;
 
-extension KananaRotateTypeExtension on KannaRotateType {
+  const KannaRotateType(this.type);
+
   // reference: https://github.com/Tencent/ncnn/blob/20220216/src/mat.h#L627-L637
-  int get type {
-    switch (this) {
-      case KannaRotateType.deg0:
-        return 1;
-      case KannaRotateType.deg90:
-        return 6;
-      case KannaRotateType.deg180:
-        return 3;
-      case KannaRotateType.deg270:
-        return 8;
-    }
-  }
+  final int type;
 
   static KannaRotateType fromDegree(int degree) {
     switch (degree) {

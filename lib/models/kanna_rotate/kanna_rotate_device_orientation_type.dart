@@ -3,4 +3,5 @@ enum KannaRotateDeviceOrientationType {
   portraitDown,
   landscapeLeft,
   landscapeRight,
+  ;
 }
