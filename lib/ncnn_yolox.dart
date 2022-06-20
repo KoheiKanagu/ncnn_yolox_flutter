@@ -212,7 +212,7 @@ class NcnnYolox {
   /// The process of converting to a [ui.Image] object is heavy and affects performance.
   /// If [ui.Image] is not needed, it is recommended to set null.
   ///
-  List<YoloxResults> detectYUV420({
+  DetectResults detectYUV420({
     required Uint8List y,
     required Uint8List u,
     required Uint8List v,
@@ -274,10 +274,13 @@ class NcnnYolox {
       );
     }
 
-    return detect(
-      pixels: rotated.pixels,
-      width: rotated.width,
-      height: rotated.height,
+    return DetectResults(
+      results: detect(
+        pixels: rotated.pixels,
+        width: rotated.width,
+        height: rotated.height,
+      ),
+      image: rotated,
     );
   }
 
@@ -299,7 +302,7 @@ class NcnnYolox {
   /// The process of converting to a [ui.Image] object is heavy and affects performance.
   /// If [ui.Image] is not needed, it is recommended to set null.
   ///
-  List<YoloxResults> detectBGRA8888({
+  DetectResults detectBGRA8888({
     required Uint8List pixels,
     required int width,
     required int height,
@@ -325,11 +328,15 @@ class NcnnYolox {
         onDecodeImage,
       );
     }
-    return detect(
-      pixels: rotated.pixels,
-      pixelFormat: PixelFormat.bgra,
-      width: rotated.width,
-      height: rotated.height,
+
+    return DetectResults(
+      results: detect(
+        pixels: rotated.pixels,
+        pixelFormat: PixelFormat.bgra,
+        width: rotated.width,
+        height: rotated.height,
+      ),
+      image: rotated,
     );
   }
 

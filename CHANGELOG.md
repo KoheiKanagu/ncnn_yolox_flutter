@@ -1,3 +1,7 @@
+## 0.3.0
+
+- impl DetectResults #43
+
 ## 0.2.0
 
 - Add PixelChannel to KannaRotateResults #27
