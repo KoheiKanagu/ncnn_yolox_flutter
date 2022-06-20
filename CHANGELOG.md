@@ -1,3 +1,11 @@
+## 0.2.0
+
+- Add PixelChannel to KannaRotateResults #27
+- Support Flutter3 #29
+- refactor example app #32
+- support freezed #33
+- A new method, detect, has been added for convenience when using CameraImage. #35
+
 ## 0.1.2
 
 - Fixed to initialize dynamicLibrary lookupFunction in the constructor.
