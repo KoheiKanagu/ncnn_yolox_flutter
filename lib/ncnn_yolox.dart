@@ -243,10 +243,16 @@ class NcnnYolox {
     );
 
     if (onDecodeImage != null) {
+      final rgba = rgb2rgba(
+        rgb: rotated.pixels ?? Uint8List(0),
+        width: rotated.width,
+        height: rotated.height,
+      );
+
       ui.decodeImageFromPixels(
-        pixels,
-        width,
-        height,
+        rgba,
+        rotated.width,
+        rotated.height,
         ui.PixelFormat.rgba8888,
         onDecodeImage,
       );
