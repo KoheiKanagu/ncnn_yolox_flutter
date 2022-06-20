@@ -159,7 +159,7 @@ jobs:
           cd ncnn
           git submodule update --init
       - name: download-openmp-ios-bitcode
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: openmp-ios-bitcode
           path: openmp-ios-bitcode
