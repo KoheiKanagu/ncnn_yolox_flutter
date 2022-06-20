@@ -62,34 +62,38 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
         log('not support format');
         return;
       case ImageFormatGroup.yuv420:
-        state = _ncnnYolox.detectYUV420(
-          y: cameraImage.planes[0].bytes,
-          u: cameraImage.planes[1].bytes,
-          v: cameraImage.planes[2].bytes,
-          width: cameraImage.width,
-          height: cameraImage.height,
-          deviceOrientationType:
-              _read(myCameraController).deviceOrientationType,
-          sensorOrientation: _read(myCameraController).sensorOrientation,
-          onDecodeImage: (image) {
-            _read(previewImage.state).state = image;
-            completer.complete();
-          },
-        );
+        state = _ncnnYolox
+            .detectYUV420(
+              y: cameraImage.planes[0].bytes,
+              u: cameraImage.planes[1].bytes,
+              v: cameraImage.planes[2].bytes,
+              width: cameraImage.width,
+              height: cameraImage.height,
+              deviceOrientationType:
+                  _read(myCameraController).deviceOrientationType,
+              sensorOrientation: _read(myCameraController).sensorOrientation,
+              onDecodeImage: (image) {
+                _read(previewImage.state).state = image;
+                completer.complete();
+              },
+            )
+            .results;
         break;
       case ImageFormatGroup.bgra8888:
-        state = _ncnnYolox.detectBGRA8888(
-          pixels: cameraImage.planes[0].bytes,
-          width: cameraImage.width,
-          height: cameraImage.height,
-          deviceOrientationType:
-              _read(myCameraController).deviceOrientationType,
-          sensorOrientation: _read(myCameraController).sensorOrientation,
-          onDecodeImage: (image) {
-            _read(previewImage.state).state = image;
-            completer.complete();
-          },
-        );
+        state = _ncnnYolox
+            .detectBGRA8888(
+              pixels: cameraImage.planes[0].bytes,
+              width: cameraImage.width,
+              height: cameraImage.height,
+              deviceOrientationType:
+                  _read(myCameraController).deviceOrientationType,
+              sensorOrientation: _read(myCameraController).sensorOrientation,
+              onDecodeImage: (image) {
+                _read(previewImage.state).state = image;
+                completer.complete();
+              },
+            )
+            .results;
         break;
     }
 
