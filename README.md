@@ -6,19 +6,19 @@ This is a plugin to run YOLOX on ncnn.
 
 ### on Android
 
-| Real Device                                                                                                             | Simulator                                                                                                                         |
-| ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/screenshots/android_demo.gif?raw=true" width=600> | <img src="https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/screenshots/android_simulator_demo.gif?raw=true" width=300> |
+<https://user-images.githubusercontent.com/6175794/174544914-f9f4c0ca-2b52-41a5-880a-171decb2a514.mp4>
+
+<https://user-images.githubusercontent.com/6175794/174544918-27505730-7182-48b7-a6e1-1aea457bb522.mp4>
+
+<https://user-images.githubusercontent.com/6175794/174544922-f59d4e45-b350-48c2-9c2a-bf0e2a8901c3.mp4>
 
 ### on iOS
 
-| Real Device                                                                                                         | Simulator                                                                                                                     |
-| ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| <img src="https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/screenshots/ios_demo.gif?raw=true" width=600> | <img src="https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/screenshots/ios_simulator_demo.gif?raw=true" width=300> |
+<https://user-images.githubusercontent.com/6175794/174546823-6094f13c-c6bc-4433-a165-09b1810c0818.mov>
 
-### Stream
+<https://user-images.githubusercontent.com/6175794/174544939-49609582-c305-4a39-ac98-2e6f24fc4b69.MP4>
 
-<img src="https://github.com/KoheiKanagu/ncnn_yolox_flutter/blob/main/screenshots/ios_stream_demo.gif?raw=true" width=300>
+<https://user-images.githubusercontent.com/6175794/174544949-177c3306-98c8-4d65-9528-dabec5c3df55.MP4>
 
 ## How to use
 
