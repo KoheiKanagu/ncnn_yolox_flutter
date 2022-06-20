@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:ffi/ffi.dart';
 import 'package:flutter/services.dart';
@@ -190,6 +191,124 @@ class NcnnYolox {
     }
 
     return [];
+  }
+
+  /// Detect YoloX
+  /// Run it after initYolox
+  ///
+  /// When detecting from an image byte array, specify [y], [u] and [v].
+  /// [y] and [u] and [v] are the YUV420 data of the image.
+  /// [width] and [height] are the width and height of the image.
+  ///
+  /// [deviceOrientationType] is the device orientation.
+  /// It can be obtained from CameraController of the camera package.
+  /// https://github.com/flutter/plugins/blob/main/packages/camera/camera/lib/src/camera_controller.dart#L134
+  ///
+  /// [sensorOrientation] is the orientation of the camera sensor.
+  /// It can be obtained from CameraController of the camera package.
+  /// https://github.com/flutter/plugins/blob/main/packages/camera/camera_platform_interface/lib/src/types/camera_description.dart#L42
+  ///
+  /// [onDecodeImage] is a callback function to decode the image.
+  /// The process of converting to a [ui.Image] object is heavy and affects performance.
+  /// If [ui.Image] is not needed, it is recommended to set null.
+  ///
+  List<YoloxResults> detectYUV420({
+    required Uint8List y,
+    required Uint8List u,
+    required Uint8List v,
+    required int width,
+    required int height,
+    required KannaRotateDeviceOrientationType deviceOrientationType,
+    required int sensorOrientation,
+    void Function(ui.Image image)? onDecodeImage,
+  }) {
+    final yuv420sp = yuv420sp2Uint8List(
+      y: y,
+      u: u,
+      v: v,
+    );
+
+    final pixels = yuv420sp2rgb(
+      yuv420sp: yuv420sp,
+      width: width,
+      height: height,
+    );
+
+    final rotated = kannaRotate(
+      pixels: pixels,
+      width: width,
+      height: height,
+      deviceOrientationType: deviceOrientationType,
+      sensorOrientation: sensorOrientation,
+    );
+
+    if (onDecodeImage != null) {
+      ui.decodeImageFromPixels(
+        pixels,
+        width,
+        height,
+        ui.PixelFormat.rgba8888,
+        onDecodeImage,
+      );
+    }
+
+    return detect(
+      pixels: rotated.pixels,
+      width: rotated.width,
+      height: rotated.height,
+    );
+  }
+
+  /// Detect YoloX
+  /// Run it after initYolox
+  ///
+  /// When detecting from an image byte array, specify [pixels].
+  /// [width] and [height] are the width and height of the image.
+  ///
+  /// [deviceOrientationType] is the device orientation.
+  /// It can be obtained from CameraController of the camera package.
+  /// https://github.com/flutter/plugins/blob/main/packages/camera/camera/lib/src/camera_controller.dart#L134
+  ///
+  /// [sensorOrientation] is the orientation of the camera sensor.
+  /// It can be obtained from CameraController of the camera package.
+  /// https://github.com/flutter/plugins/blob/main/packages/camera/camera_platform_interface/lib/src/types/camera_description.dart#L42
+  ///
+  /// [onDecodeImage] is a callback function to decode the image.
+  /// The process of converting to a [ui.Image] object is heavy and affects performance.
+  /// If [ui.Image] is not needed, it is recommended to set null.
+  ///
+  List<YoloxResults> detectBGRA8888({
+    required Uint8List pixels,
+    required int width,
+    required int height,
+    required KannaRotateDeviceOrientationType deviceOrientationType,
+    required int sensorOrientation,
+    void Function(ui.Image image)? onDecodeImage,
+  }) {
+    final rotated = kannaRotate(
+      pixels: pixels,
+      pixelChannel: PixelChannel.c4,
+      width: width,
+      height: height,
+      deviceOrientationType: deviceOrientationType,
+      sensorOrientation: sensorOrientation,
+    );
+
+    if (onDecodeImage != null) {
+      ui.decodeImageFromPixels(
+        pixels,
+        width,
+        height,
+        ui.PixelFormat.rgba8888,
+        onDecodeImage,
+      );
+    }
+    return detect(
+      pixels: rotated.pixels,
+      pixelFormat: PixelFormat.bgra,
+      width: rotated.width,
+      height: rotated.height,
+    );
   }
 
   /// Reads an image from pixel data and executes Detect.
