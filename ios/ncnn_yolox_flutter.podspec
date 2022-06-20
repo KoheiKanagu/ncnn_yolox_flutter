@@ -25,7 +25,7 @@ A new flutter plugin project.
   s.prepare_command = <<-CMD
     rm -rf "ncnn.xcframework"
     rm -rf "openmp.xcframework"
-    curl "https://github.com/KoheiKanagu/ncnn_yolox_flutter/releases/download/0.0.6/ncnn-ios-bitcode_xcframework.zip" -L -o "ncnn-ios-bitcode_xcframework.zip"
+    curl "https://github.com/KoheiKanagu/ncnn_yolox_flutter/releases/download/0.2.1/ncnn-ios-bitcode_xcframework.zip" -L -o "ncnn-ios-bitcode_xcframework.zip"
     unzip "ncnn-ios-bitcode_xcframework.zip"
     rm "ncnn-ios-bitcode_xcframework.zip"
   CMD
