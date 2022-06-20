@@ -71,7 +71,7 @@ _results = ncnn.detect(
 );
 ```
 
-Please check [example/lib](example/lib) for specific usage.
+Please check [example/lib/providers/ncnn_yolox_controller.dart](example/lib/providers/ncnn_yolox_controller.dart) for specific usage.
 
 ## How to set up for using custom ncnn and custom YOLOX model
 
