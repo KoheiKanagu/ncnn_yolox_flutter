@@ -1,29 +1,15 @@
 // ignore_for_file: constant_identifier_names
 
 enum PixelFormat {
-  rgb,
-  rgba,
-  bgr,
-  bgra,
-}
+  rgb(_PIXEL_RGB2BGR),
+  rgba(_PIXEL_RGBA2BGR),
+  bgr(_PIXEL_BGR),
+  bgra(_PIXEL_BGRA2BGR),
+  ;
 
-extension PixelFormatExtension on PixelFormat {
-  int get type {
-    switch (this) {
-      case PixelFormat.rgb:
-        return _PIXEL_RGB2BGR;
-      // return 131073;
-      case PixelFormat.rgba:
-        return _PIXEL_RGBA2BGR;
-      // return 131076;
-      case PixelFormat.bgr:
-        return _PIXEL_BGR;
-      // return 2;
-      case PixelFormat.bgra:
-        return _PIXEL_BGRA2BGR;
-      // return 131077;
-    }
-  }
+  const PixelFormat(this.type);
+
+  final int type;
 }
 
 /// YOLOX input must be BGR.

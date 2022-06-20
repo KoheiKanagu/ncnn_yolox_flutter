@@ -388,7 +388,7 @@ class NcnnYolox {
         sensorOrientation < 0 ||
         sensorOrientation > 360 ||
         sensorOrientation % 90 != 0) {
-      return KannaRotateResults.empty();
+      return const KannaRotateResults();
     }
 
     var rotateType = KannaRotateType.deg0;
@@ -399,28 +399,28 @@ class NcnnYolox {
     ///
     switch (deviceOrientationType) {
       case KannaRotateDeviceOrientationType.portraitUp:
-        rotateType = KananaRotateTypeExtension.fromDegree(
+        rotateType = KannaRotateType.fromDegree(
           Platform.isIOS
               ? (-90 + sensorOrientation) % 360
               : (0 + sensorOrientation) % 360,
         );
         break;
       case KannaRotateDeviceOrientationType.landscapeRight:
-        rotateType = KananaRotateTypeExtension.fromDegree(
+        rotateType = KannaRotateType.fromDegree(
           Platform.isIOS
               ? (-90 + sensorOrientation) % 360
               : (90 + sensorOrientation) % 360,
         );
         break;
       case KannaRotateDeviceOrientationType.portraitDown:
-        rotateType = KananaRotateTypeExtension.fromDegree(
+        rotateType = KannaRotateType.fromDegree(
           Platform.isIOS
               ? (-90 + sensorOrientation) % 360
               : (180 + sensorOrientation) % 360,
         );
         break;
       case KannaRotateDeviceOrientationType.landscapeLeft:
-        rotateType = KananaRotateTypeExtension.fromDegree(
+        rotateType = KannaRotateType.fromDegree(
           Platform.isIOS
               ? (-90 + sensorOrientation) % 360
               : (270 + sensorOrientation) % 360,
@@ -430,10 +430,10 @@ class NcnnYolox {
 
     if (rotateType == KannaRotateType.deg0) {
       return KannaRotateResults(
-        pixels,
-        width,
-        height,
-        pixelChannel,
+        pixels: pixels,
+        width: width,
+        height: height,
+        pixelChannel: pixelChannel,
       );
     }
 
@@ -478,10 +478,10 @@ class NcnnYolox {
       ..free(dst);
 
     return KannaRotateResults(
-      results,
-      dstw,
-      dsth,
-      pixelChannel,
+      pixels: results,
+      width: dstw,
+      height: dsth,
+      pixelChannel: pixelChannel,
     );
   }
 
