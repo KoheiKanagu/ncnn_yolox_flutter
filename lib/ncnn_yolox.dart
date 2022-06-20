@@ -321,7 +321,7 @@ class NcnnYolox {
         pixels,
         width,
         height,
-        ui.PixelFormat.rgba8888,
+        ui.PixelFormat.bgra8888,
         onDecodeImage,
       );
     }
