@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  NCNN_VERSION: 20220216
+  NCNN_VERSION: 20220420
   DEVELOPER_DIR: /Applications/Xcode_12.4.app/Contents/Developer
 
 jobs:
