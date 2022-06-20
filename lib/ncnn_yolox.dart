@@ -208,7 +208,7 @@ class NcnnYolox {
   /// It can be obtained from CameraController of the camera package.
   /// https://github.com/flutter/plugins/blob/main/packages/camera/camera_platform_interface/lib/src/types/camera_description.dart#L42
   ///
-  /// [onDecodeImage] is a callback function to decode the image.
+  /// [onDecodeImage] and [onYuv420sp2rgbImage] are callback functions for decoding images.
   /// The process of converting to a [ui.Image] object is heavy and affects performance.
   /// If [ui.Image] is not needed, it is recommended to set null.
   ///
@@ -221,6 +221,7 @@ class NcnnYolox {
     required KannaRotateDeviceOrientationType deviceOrientationType,
     required int sensorOrientation,
     void Function(ui.Image image)? onDecodeImage,
+    void Function(ui.Image image)? onYuv420sp2rgbImage,
   }) {
     final yuv420sp = yuv420sp2Uint8List(
       y: y,
@@ -233,6 +234,21 @@ class NcnnYolox {
       width: width,
       height: height,
     );
+    if (onYuv420sp2rgbImage != null) {
+      final rgba = rgb2rgba(
+        rgb: pixels,
+        width: width,
+        height: height,
+      );
+
+      ui.decodeImageFromPixels(
+        rgba,
+        width,
+        height,
+        ui.PixelFormat.rgba8888,
+        onYuv420sp2rgbImage,
+      );
+    }
 
     final rotated = kannaRotate(
       pixels: pixels,
