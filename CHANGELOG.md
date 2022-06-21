@@ -1,3 +1,7 @@
+## 0.3.1
+
+- improvement detect method #46
+
 ## 0.3.0
 
 - impl DetectResults #43
