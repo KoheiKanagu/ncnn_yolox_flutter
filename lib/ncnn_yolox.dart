@@ -218,6 +218,8 @@ class NcnnYolox {
     required Uint8List u,
     required Uint8List v,
     required int height,
+    @Deprecated("width is automatically calculated from the length of the y.")
+        int width = 0,
     required KannaRotateDeviceOrientationType deviceOrientationType,
     required int sensorOrientation,
     void Function(ui.Image image)? onDecodeImage,
@@ -308,6 +310,8 @@ class NcnnYolox {
   DetectResults detectBGRA8888({
     required Uint8List pixels,
     required int height,
+    @Deprecated("width is automatically calculated from the length of the pixels.")
+        int width = 0,
     required KannaRotateDeviceOrientationType deviceOrientationType,
     required int sensorOrientation,
     void Function(ui.Image image)? onDecodeImage,
