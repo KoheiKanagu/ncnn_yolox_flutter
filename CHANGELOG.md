@@ -1,3 +1,7 @@
+## 0.3.1
+
+- The Width of the stream's CameraImage is width from the length of the pixels. #45
+
 ## 0.3.0
 
 - impl DetectResults #43
