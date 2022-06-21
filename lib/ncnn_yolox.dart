@@ -120,7 +120,7 @@ class NcnnYolox {
   late _KannaRotate _kannaRotateFunction;
   late _InitYolox _initYoloxFunction;
 
-  /// Initialize YoloX
+  /// Initialize YOLOX
   /// Run it for the first time
   ///
   /// - [modelPath] - path to model file. like "assets/yolox.bin"
@@ -155,7 +155,7 @@ class NcnnYolox {
     return file.path;
   }
 
-  /// Detect YoloX
+  /// Detect with YOLOX
   /// Run it after initYolox
   ///
   /// When detecting from an image file, specify [imagePath].
@@ -168,6 +168,7 @@ class NcnnYolox {
   /// [width] and [height] are the width and height of the image.
   ///
   /// Return a list of [YoloxResults].
+  @Deprecated('Use detectImageFile or detectPixels instead')
   List<YoloxResults> detect({
     String? imagePath,
     Uint8List? pixels,
@@ -176,13 +177,13 @@ class NcnnYolox {
     int? height,
   }) {
     if (imagePath != null) {
-      return _detectWithImagePath(
-        imagePath: imagePath,
+      return detectImageFile(
+        imagePath,
       );
     }
 
     if (width != null && height != null && pixels != null) {
-      return _detectWithPixels(
+      return detectPixels(
         pixels: pixels,
         pixelFormat: pixelFormat,
         width: width,
@@ -193,7 +194,7 @@ class NcnnYolox {
     return [];
   }
 
-  /// Detect YoloX
+  /// Detect with YOLOX
   /// Run it after initYolox
   ///
   /// When detecting from an image byte array, specify [y], [u] and [v].
@@ -275,8 +276,8 @@ class NcnnYolox {
     }
 
     return DetectResults(
-      results: detect(
-        pixels: rotated.pixels,
+      results: detectPixels(
+        pixels: rotated.pixels ?? Uint8List(0),
         width: rotated.width,
         height: rotated.height,
       ),
@@ -284,7 +285,7 @@ class NcnnYolox {
     );
   }
 
-  /// Detect YoloX
+  /// Detect with YOLOX
   /// Run it after initYolox
   ///
   /// When detecting from an image byte array, specify [pixels].
@@ -330,8 +331,8 @@ class NcnnYolox {
     }
 
     return DetectResults(
-      results: detect(
-        pixels: rotated.pixels,
+      results: detectPixels(
+        pixels: rotated.pixels ?? Uint8List(0),
         pixelFormat: PixelFormat.bgra,
         width: rotated.width,
         height: rotated.height,
@@ -340,6 +341,9 @@ class NcnnYolox {
     );
   }
 
+  /// Detect with YOLOX
+  /// Run it after initYolox
+  ///
   /// Reads an image from pixel data and executes Detect.
   ///
   /// [pixels] is pixel data of the image. [pixelFormat] is the pixel format.
@@ -347,7 +351,7 @@ class NcnnYolox {
   ///
   /// Returns a list of [YoloxResults]
   ///
-  List<YoloxResults> _detectWithPixels({
+  List<YoloxResults> detectPixels({
     required Uint8List pixels,
     PixelFormat pixelFormat = PixelFormat.rgb,
     required int width,
@@ -371,14 +375,17 @@ class NcnnYolox {
     return results;
   }
 
+  /// Detect with YOLOX
+  /// Run it after initYolox
+  ///
   /// Read the image from the file path and execute Detect.
   ///
   /// The [imagePath] should be the path to the image, such as "assets/image.jpg".
   /// Returns the results of a YOLOX run as a List of [YoloxResults].
   ///
-  List<YoloxResults> _detectWithImagePath({
-    required String imagePath,
-  }) {
+  List<YoloxResults> detectImageFile(
+    String imagePath,
+  ) {
     assert(imagePath.isNotEmpty, 'imagePath is empty');
 
     if (imagePath.isEmpty) {
