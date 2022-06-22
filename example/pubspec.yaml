@@ -15,6 +15,7 @@ dependencies:
   image_picker: ^0.8.4+8
   ncnn_yolox_flutter:
     path: ../
+    version: ^0.3.0
 
 dev_dependencies:
   flutter_test:
