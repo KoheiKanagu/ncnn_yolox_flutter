@@ -1,0 +1,51 @@
+name: Closed Pull Requests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+env:
+  FLUTTER_VERSION: "3.0.2" # FIXME
+
+jobs:
+  build:
+    if: (github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch') && github.actor != 'dependabot[bot]'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        include:
+          - os: ubuntu-latest
+            build_script: .github/workflows/scripts/build_android.sh
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      ### Setup ###
+      - uses: actions/checkout@v3
+
+      - name: Gradle Cache
+        if: ${{ runner.os == 'linux' }}
+        uses: actions/cache@v3.0.4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: "Install Flutter"
+        run: ./.github/workflows/scripts/install-flutter.sh $FLUTTER_VERSION
+
+      ### Build ###
+      - name: Build
+        run: ${{ matrix.build_script }}
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          path: example/build/app/outputs/flutter-apk/app-release.apk

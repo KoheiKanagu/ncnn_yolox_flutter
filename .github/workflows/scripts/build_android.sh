@@ -5,4 +5,4 @@ cd example
 
 flutter pub get
 
-flutter build appbundle
+flutter build apk
