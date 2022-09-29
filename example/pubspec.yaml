@@ -7,7 +7,7 @@ environment:
   sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
-  camera: ^0.9.4+14
+  camera: ^0.10.0+3
   flutter:
     sdk: flutter
   hooks_riverpod: ^2.0.0-dev.9
