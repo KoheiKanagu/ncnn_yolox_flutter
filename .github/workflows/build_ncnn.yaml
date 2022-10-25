@@ -82,7 +82,7 @@ jobs:
           rm -f ${{ env.PACKAGENAME }}.zip
           zip -9 -r ${{ env.PACKAGENAME }}.zip ${{ env.PACKAGENAME }}
       - name: upload-zip
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: ${{ env.PACKAGENAME }}
           path: ncnn/${{ env.PACKAGENAME }}
@@ -141,7 +141,7 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/openmp-install/lib
           lipo -create openmp-11.0.0.src/build/install/lib/libomp.a openmp-11.0.0.src/build-simulator/install/lib/libomp.a -o $GITHUB_WORKSPACE/openmp-install/lib/libomp.a
       - name: upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: openmp-ios-bitcode
           path: openmp-install
@@ -227,7 +227,7 @@ jobs:
           zip -9 -y -r ${{ env.PACKAGENAME }}.zip openmp.framework ncnn.framework
 
       - name: upload-zip
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: ${{ env.PACKAGENAME }}
           path: ncnn/${{ env.PACKAGENAME }}.zip
@@ -293,7 +293,7 @@ jobs:
           zip -9 -y -r ${{ env.PACKAGENAME }}_xcframework.zip openmp.xcframework ncnn.xcframework
 
       - name: upload-zip
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: ${{ env.PACKAGENAME }}_xcframework
           path: ncnn/${{ env.PACKAGENAME }}_xcframework.zip
