@@ -1,4 +1,4 @@
-## 0.3.1
+## 0.4.0
 
 - The Width of the stream's CameraImage is width from the length of the pixels. #45
 - improvement detect method #46
