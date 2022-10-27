@@ -5,7 +5,7 @@ on:
   pull_request:
 
 env:
-  FLUTTER_VERSION: "3.0.2" # FIXME
+  FLUTTER_VERSION: "3.3.5" # FIXME
 
 jobs:
   build:
