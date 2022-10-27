@@ -199,7 +199,8 @@ class NcnnYolox {
   ///
   /// When detecting from an image byte array, specify [y], [u] and [v].
   /// [y] and [u] and [v] are the YUV420 data of the image.
-  /// [width] and [height] are the width and height of the image.
+  /// [height] is the height of the image.
+  /// The width of the image is calculated from [y] length.
   ///
   /// [deviceOrientationType] is the device orientation.
   /// It can be obtained from CameraController of the camera package.
@@ -217,8 +218,9 @@ class NcnnYolox {
     required Uint8List y,
     required Uint8List u,
     required Uint8List v,
-    required int width,
     required int height,
+    @Deprecated("width is automatically calculated from the length of the y.")
+        int width = 0,
     required KannaRotateDeviceOrientationType deviceOrientationType,
     required int sensorOrientation,
     void Function(ui.Image image)? onDecodeImage,
@@ -229,6 +231,8 @@ class NcnnYolox {
       u: u,
       v: v,
     );
+
+    final width = y.length ~/ height;
 
     final pixels = yuv420sp2rgb(
       yuv420sp: yuv420sp,
@@ -289,7 +293,8 @@ class NcnnYolox {
   /// Run it after initYolox
   ///
   /// When detecting from an image byte array, specify [pixels].
-  /// [width] and [height] are the width and height of the image.
+  /// [height] is the height of the image.
+  /// The width of the image is calculated from [pixels] length.
   ///
   /// [deviceOrientationType] is the device orientation.
   /// It can be obtained from CameraController of the camera package.
@@ -305,12 +310,15 @@ class NcnnYolox {
   ///
   DetectResults detectBGRA8888({
     required Uint8List pixels,
-    required int width,
     required int height,
+    @Deprecated("width is automatically calculated from the length of the pixels.")
+        int width = 0,
     required KannaRotateDeviceOrientationType deviceOrientationType,
     required int sensorOrientation,
     void Function(ui.Image image)? onDecodeImage,
   }) {
+    final width = pixels.length ~/ height ~/ 4;
+
     final rotated = kannaRotate(
       pixels: pixels,
       pixelChannel: PixelChannel.c4,

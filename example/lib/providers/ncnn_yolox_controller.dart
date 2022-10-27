@@ -60,7 +60,6 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
               y: cameraImage.planes[0].bytes,
               u: cameraImage.planes[1].bytes,
               v: cameraImage.planes[2].bytes,
-              width: cameraImage.width,
               height: cameraImage.height,
               deviceOrientationType:
                   _read(myCameraController).deviceOrientationType,
@@ -76,7 +75,6 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
         state = _ncnnYolox
             .detectBGRA8888(
               pixels: cameraImage.planes[0].bytes,
-              width: cameraImage.width,
               height: cameraImage.height,
               deviceOrientationType:
                   _read(myCameraController).deviceOrientationType,
