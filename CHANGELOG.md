@@ -1,5 +1,7 @@
 ## 0.4.0
 
+- dart 2.18.0 [#72](https://github.com/KoheiKanagu/ncnn_yolox_flutter/issues/72)
+- Fixed a memory leak on model loading [#71](https://github.com/KoheiKanagu/ncnn_yolox_flutter/issues/71)
 - The Width of the stream's CameraImage is width from the length of the pixels. [#45](https://github.com/KoheiKanagu/ncnn_yolox_flutter/issues/45)
 - improvement detect method [#46](https://github.com/KoheiKanagu/ncnn_yolox_flutter/issues/46)
 
