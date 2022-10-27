@@ -19,7 +19,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   freezed: ^2.0.3+1
-  pedantic_mono: any
+  pedantic_mono: ^1.20.0
 
 flutter:
   plugin:
