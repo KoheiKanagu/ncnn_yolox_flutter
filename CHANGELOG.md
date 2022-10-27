@@ -1,4 +1,4 @@
-## 0.3.1
+## 0.4.0
 
 - improvement detect method #46
 
