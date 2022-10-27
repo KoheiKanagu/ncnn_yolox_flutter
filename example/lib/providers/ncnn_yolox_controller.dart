@@ -34,21 +34,14 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
   }
 
   Future<void> detectFromImageFile(XFile file) async {
+    state = _ncnnYolox.detectImageFile(file.path);
+    log(state.toString());
+
     final decodedImage = await decodeImageFromList(
       File(
         file.path,
       ).readAsBytesSync(),
     );
-
-    final pixels = (await decodedImage.toByteData())!.buffer.asUint8List();
-    state = _ncnnYolox.detect(
-      pixels: pixels,
-      pixelFormat: PixelFormat.rgba,
-      width: decodedImage.width,
-      height: decodedImage.height,
-    );
-    log(state.toString());
-
     _read(previewImage.state).state = decodedImage;
   }
 

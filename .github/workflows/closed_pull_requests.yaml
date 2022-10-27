@@ -1,22 +1,24 @@
-name: Pull Requests
+name: Closed Pull Requests
 
 on:
   workflow_dispatch:
   pull_request:
+    branches:
+      - main
+    types:
+      - closed
 
 env:
   FLUTTER_VERSION: "3.3.5" # FIXME
 
 jobs:
   build:
+    if: (github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch') && github.actor != 'dependabot[bot]'
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [ubuntu-latest]
         include:
-          - os: macos-latest
-            build_script: .github/workflows/scripts/build_ios.sh
-
           - os: ubuntu-latest
             build_script: .github/workflows/scripts/build_android.sh
 
@@ -24,15 +26,6 @@ jobs:
     steps:
       ### Setup ###
       - uses: actions/checkout@v3
-
-      - name: CocoaPods Cache
-        if: ${{ runner.os == 'macOS' }}
-        uses: actions/cache@v3.0.11
-        with:
-          path: ./example/ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}-v1
-          restore-keys: |
-            ${{ runner.os }}-pods-
 
       - name: Gradle Cache
         if: ${{ runner.os == 'linux' }}
@@ -51,3 +44,9 @@ jobs:
       ### Build ###
       - name: Build
         run: ${{ matrix.build_script }}
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3.1.1
+        with:
+          name: android-apk
+          path: example/build/app/outputs/flutter-apk/app-release.apk
