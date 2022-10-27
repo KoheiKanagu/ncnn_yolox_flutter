@@ -10,7 +10,7 @@ dependencies:
   camera: ^0.10.0+4
   flutter:
     sdk: flutter
-  hooks_riverpod: ^2.0.0-dev.9
+  hooks_riverpod: ^2.0.2
   image: ^3.2.2
   image_picker: ^0.8.6
   ncnn_yolox_flutter:
