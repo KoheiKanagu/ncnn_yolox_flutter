@@ -399,9 +399,12 @@ static void draw_objects(const cv::Mat& bgr, const std::vector<Object>& objects)
     cv::waitKey(0);
 }
 
-extern "C" __attribute__((visibility("default"))) __attribute__((used)) void initYolox(char *modelPath, char *paramPath)
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) void initYolox(char *modelPath, char *paramPath, bool autoDispose)
 {
-    yolox.clear();
+    if (autoDispose)
+    {
+        yolox.clear();
+    }
 
     // Focus in yolov5
     yolox.register_custom_layer("YoloV5Focus", YoloV5Focus_layer_creator);

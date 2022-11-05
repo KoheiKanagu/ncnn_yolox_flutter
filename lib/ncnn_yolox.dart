@@ -83,11 +83,13 @@ typedef _DetectWithImagePathYolox = Pointer<Utf8> Function(
 typedef _InitYoloxNative = Void Function(
   Pointer<Utf8> modelPath,
   Pointer<Utf8> paramPath,
+  Bool autoDispose,
 );
 
 typedef _InitYolox = void Function(
   Pointer<Utf8> modelPath,
   Pointer<Utf8> paramPath,
+  bool autoDispose,
 );
 
 class NcnnYolox {
@@ -124,9 +126,11 @@ class NcnnYolox {
   ///
   /// - [modelPath] - path to model file. like "assets/yolox.bin"
   /// - [paramPath] - path to parameter file. like "assets/yolox.param"
+  /// - [autoDispose] - If true, multiple calls to initYolox will automatically dispose of previous models.
   Future<void> initYolox({
     required String modelPath,
     required String paramPath,
+    bool autoDispose = true,
   }) async {
     final tempModelPath = (await _copy(modelPath)).toNativeUtf8();
     final tempParamPath = (await _copy(paramPath)).toNativeUtf8();
@@ -134,6 +138,7 @@ class NcnnYolox {
     _initYoloxFunction(
       tempModelPath,
       tempParamPath,
+      autoDispose,
     );
     calloc
       ..free(tempModelPath)
