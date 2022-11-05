@@ -32,6 +32,9 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
       modelPath: 'assets/yolox/yolox.bin',
       paramPath: 'assets/yolox/yolox.param',
       autoDispose: _read(ncnnYoloxOptions).autoDispose,
+      nmsThresh: _read(ncnnYoloxOptions).nmsThresh,
+      confThresh: _read(ncnnYoloxOptions).confThresh,
+      targetSize: _read(ncnnYoloxOptions).targetSize,
     );
   }
 
