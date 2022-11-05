@@ -1,3 +1,7 @@
+## Unreleased
+
+- Recently loaded model can now be disposed of at any time. By default, recently loaded model is automatically disposed of when initYolox is called again. [#76](https://github.com/KoheiKanagu/ncnn_yolox_flutter/pull/)
+
 ## 0.4.0
 
 - dart 2.18.0 [#72](https://github.com/KoheiKanagu/ncnn_yolox_flutter/issues/72)
