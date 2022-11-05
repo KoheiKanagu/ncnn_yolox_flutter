@@ -9,6 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ncnn_yolox_flutter/models/models.dart';
 import 'package:ncnn_yolox_flutter/ncnn_yolox.dart';
 import 'package:ncnn_yolox_flutter_example/providers/my_camera_controller.dart';
+import 'package:ncnn_yolox_flutter_example/providers/ncnn_yolox_options.dart';
 
 final ncnnYoloxController =
     StateNotifierProvider<NcnnYoloxController, List<YoloxResults>>(
@@ -30,6 +31,7 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
     await _ncnnYolox.initYolox(
       modelPath: 'assets/yolox/yolox.bin',
       paramPath: 'assets/yolox/yolox.param',
+      autoDispose: _read(ncnnYoloxOptions).autoDispose,
     );
   }
 

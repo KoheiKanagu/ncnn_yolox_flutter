@@ -80,6 +80,10 @@ typedef _DetectWithImagePathYolox = Pointer<Utf8> Function(
   Pointer<Utf8> imagePath,
 );
 
+typedef _DisposeYoloxNative = Void Function();
+
+typedef _DisposeYolox = void Function();
+
 typedef _InitYoloxNative = Void Function(
   Pointer<Utf8> modelPath,
   Pointer<Utf8> paramPath,
@@ -104,6 +108,8 @@ class NcnnYolox {
         dynamicLibrary.lookupFunction<_Rgb2rgbaNative, _Rgb2rgba>('rgb2rgba');
     _kannaRotateFunction = dynamicLibrary
         .lookupFunction<_KannaRotateNative, _KannaRotate>('kannaRotate');
+    _disposeYoloxFunction = dynamicLibrary
+        .lookupFunction<_DisposeYoloxNative, _DisposeYolox>("disposeYolox");
     _initYoloxFunction = dynamicLibrary
         .lookupFunction<_InitYoloxNative, _InitYolox>('initYolox');
   }
@@ -117,6 +123,7 @@ class NcnnYolox {
   late _Yuv420sp2rgb _yuv420sp2rgbFunction;
   late _Rgb2rgba _rgb2rgbaFunction;
   late _KannaRotate _kannaRotateFunction;
+  late _DisposeYolox _disposeYoloxFunction;
   late _InitYolox _initYoloxFunction;
 
   /// Initialize YOLOX
@@ -124,10 +131,16 @@ class NcnnYolox {
   ///
   /// - [modelPath] - path to model file. like "assets/yolox.bin"
   /// - [paramPath] - path to parameter file. like "assets/yolox.param"
+  /// - [autoDispose] - If true, multiple calls to initYolox will automatically dispose of recently loaded model.
   Future<void> initYolox({
     required String modelPath,
     required String paramPath,
+    bool autoDispose = true,
   }) async {
+    if (autoDispose) {
+      dispose();
+    }
+
     final tempModelPath = (await _copy(modelPath)).toNativeUtf8();
     final tempParamPath = (await _copy(paramPath)).toNativeUtf8();
 
@@ -138,6 +151,11 @@ class NcnnYolox {
     calloc
       ..free(tempModelPath)
       ..free(tempParamPath);
+  }
+
+  /// Dispose of the recently loaded YOLOX model.
+  void dispose() {
+    _disposeYoloxFunction();
   }
 
   Future<String> _copy(String assetsPath) async {
