@@ -36,10 +36,6 @@
 #include <stdio.h>
 #include <vector>
 
-#define YOLOX_NMS_THRESH  0.45 // nms threshold
-#define YOLOX_CONF_THRESH 0.25 // threshold of bounding box prob
-#define YOLOX_TARGET_SIZE 416  // target image size after resize, might use 416 for small model
-
 ncnn::Net yolox;
 
 // YOLOX use the same focus in yolov5
@@ -257,29 +253,29 @@ static void generate_yolox_proposals(std::vector<GridAndStride> grid_strides, co
     } // point anchor loop
 }
 
-static int detect_yolox(const unsigned char *pixels, int type, int img_w, int img_h, std::vector<Object> &objects)
+static int detect_yolox(const unsigned char *pixels, int type, int img_w, int img_h, double nms_thresh, double conf_thresh, int target_size, std::vector<Object> &objects)
 {
     int w = img_w;
     int h = img_h;
     float scale = 1.f;
     if (w > h)
     {
-        scale = (float)YOLOX_TARGET_SIZE / w;
-        w = YOLOX_TARGET_SIZE;
+        scale = (float)target_size / w;
+        w = target_size;
         h = h * scale;
     }
     else
     {
-        scale = (float)YOLOX_TARGET_SIZE / h;
-        h = YOLOX_TARGET_SIZE;
+        scale = (float)target_size / h;
+        h = target_size;
         w = w * scale;
     }
 
     ncnn::Mat in = ncnn::Mat::from_pixels_resize(pixels, type, img_w, img_h, w, h);
 
-    // pad to YOLOX_TARGET_SIZE rectangle
-    int wpad = YOLOX_TARGET_SIZE - w;
-    int hpad = YOLOX_TARGET_SIZE - h;
+    // pad to target_size rectangle
+    int wpad = target_size - w;
+    int hpad = target_size - h;
     ncnn::Mat in_pad;
     // different from yolov5, yolox only pad on bottom and right side,
     // which means users don't need to extra padding info to decode boxes coordinate.
@@ -298,8 +294,8 @@ static int detect_yolox(const unsigned char *pixels, int type, int img_w, int im
         static const int stride_arr[] = {8, 16, 32}; // might have stride=64 in YOLOX
         std::vector<int> strides(stride_arr, stride_arr + sizeof(stride_arr) / sizeof(stride_arr[0]));
         std::vector<GridAndStride> grid_strides;
-        generate_grids_and_stride(YOLOX_TARGET_SIZE, strides, grid_strides);
-        generate_yolox_proposals(grid_strides, out, YOLOX_CONF_THRESH, proposals);
+        generate_grids_and_stride(target_size, strides, grid_strides);
+        generate_yolox_proposals(grid_strides, out, conf_thresh, proposals);
     }
 
     // sort all proposals by score from highest to lowest
@@ -307,7 +303,7 @@ static int detect_yolox(const unsigned char *pixels, int type, int img_w, int im
 
     // apply nms with nms_threshold
     std::vector<int> picked;
-    nms_sorted_bboxes(proposals, picked, YOLOX_NMS_THRESH);
+    nms_sorted_bboxes(proposals, picked, nms_thresh);
 
     int count = picked.size();
 
@@ -337,17 +333,17 @@ static int detect_yolox(const unsigned char *pixels, int type, int img_w, int im
     return 0;
 }
 
-static int detect_yolox_cv_mat(const cv::Mat &bgr, std::vector<Object> &objects)
+static int detect_yolox_cv_mat(const cv::Mat &bgr, double nms_thresh, double conf_thresh, int target_size, std::vector<Object> &objects)
 {
     int img_w = bgr.cols;
     int img_h = bgr.rows;
-    return detect_yolox(bgr.data, ncnn::Mat::PIXEL_BGR, img_w, img_h, objects);
+    return detect_yolox(bgr.data, ncnn::Mat::PIXEL_BGR, img_w, img_h, nms_thresh, conf_thresh, target_size, objects);
 }
 
-static int detect_yolox_pixels(const unsigned char *pixels, int pixelType, int img_w, int img_h, std::vector<Object> &objects)
+static int detect_yolox_pixels(const unsigned char *pixels, int pixelType, int img_w, int img_h, double nms_thresh, double conf_thresh, int target_size, std::vector<Object> &objects)
 {
     // https://github.com/Tencent/ncnn/blob/master/docs/how-to-use-and-FAQ/FAQ-ncnn-produce-wrong-result.md#check-input-is-rgb-or-bgr
-    return detect_yolox(pixels, pixelType, img_w, img_h, objects);
+    return detect_yolox(pixels, pixelType, img_w, img_h, nms_thresh, conf_thresh, target_size, objects);
 }
 
 static void draw_objects(const cv::Mat& bgr, const std::vector<Object>& objects)
@@ -437,7 +433,7 @@ char *parseResultsObjects(std::vector<Object> &objects)
     return result_c;
 }
 
-extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *detectWithImagePath(char *imagepath)
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *detectWithImagePath(char *imagepath, double nms_thresh, double conf_thresh, int target_size)
 {
     cv::Mat m = cv::imread(imagepath, 1);
 
@@ -449,15 +445,15 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *de
     }
 
     std::vector<Object> objects;
-    detect_yolox_cv_mat(m, objects);
+    detect_yolox_cv_mat(m, nms_thresh, conf_thresh, target_size, objects);
 
     return parseResultsObjects(objects);
 }
 
-extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *detectWithPixels(const unsigned char *pixels, int pixelType, int width, int height)
+extern "C" __attribute__((visibility("default"))) __attribute__((used)) char *detectWithPixels(const unsigned char *pixels, int pixelType, int width, int height, double nms_thresh, double conf_thresh, int target_size)
 {
     std::vector<Object> objects;
-    detect_yolox_pixels(pixels, pixelType, width, height, objects);
+    detect_yolox_pixels(pixels, pixelType, width, height, nms_thresh, conf_thresh, target_size, objects);
 
     return parseResultsObjects(objects);
 }
