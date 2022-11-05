@@ -17,6 +17,9 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$NcnnYoloxOptions {
   bool get autoDispose => throw _privateConstructorUsedError;
+  double get nmsThresh => throw _privateConstructorUsedError;
+  double get confThresh => throw _privateConstructorUsedError;
+  int get targetSize => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $NcnnYoloxOptionsCopyWith<NcnnYoloxOptions> get copyWith =>
@@ -29,7 +32,8 @@ abstract class $NcnnYoloxOptionsCopyWith<$Res> {
           NcnnYoloxOptions value, $Res Function(NcnnYoloxOptions) then) =
       _$NcnnYoloxOptionsCopyWithImpl<$Res, NcnnYoloxOptions>;
   @useResult
-  $Res call({bool autoDispose});
+  $Res call(
+      {bool autoDispose, double nmsThresh, double confThresh, int targetSize});
 }
 
 /// @nodoc
@@ -46,12 +50,27 @@ class _$NcnnYoloxOptionsCopyWithImpl<$Res, $Val extends NcnnYoloxOptions>
   @override
   $Res call({
     Object? autoDispose = null,
+    Object? nmsThresh = null,
+    Object? confThresh = null,
+    Object? targetSize = null,
   }) {
     return _then(_value.copyWith(
       autoDispose: null == autoDispose
           ? _value.autoDispose
           : autoDispose // ignore: cast_nullable_to_non_nullable
               as bool,
+      nmsThresh: null == nmsThresh
+          ? _value.nmsThresh
+          : nmsThresh // ignore: cast_nullable_to_non_nullable
+              as double,
+      confThresh: null == confThresh
+          ? _value.confThresh
+          : confThresh // ignore: cast_nullable_to_non_nullable
+              as double,
+      targetSize: null == targetSize
+          ? _value.targetSize
+          : targetSize // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -64,7 +83,8 @@ abstract class _$$_NcnnYoloxOptionsCopyWith<$Res>
       __$$_NcnnYoloxOptionsCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({bool autoDispose});
+  $Res call(
+      {bool autoDispose, double nmsThresh, double confThresh, int targetSize});
 }
 
 /// @nodoc
@@ -79,12 +99,27 @@ class __$$_NcnnYoloxOptionsCopyWithImpl<$Res>
   @override
   $Res call({
     Object? autoDispose = null,
+    Object? nmsThresh = null,
+    Object? confThresh = null,
+    Object? targetSize = null,
   }) {
     return _then(_$_NcnnYoloxOptions(
       autoDispose: null == autoDispose
           ? _value.autoDispose
           : autoDispose // ignore: cast_nullable_to_non_nullable
               as bool,
+      nmsThresh: null == nmsThresh
+          ? _value.nmsThresh
+          : nmsThresh // ignore: cast_nullable_to_non_nullable
+              as double,
+      confThresh: null == confThresh
+          ? _value.confThresh
+          : confThresh // ignore: cast_nullable_to_non_nullable
+              as double,
+      targetSize: null == targetSize
+          ? _value.targetSize
+          : targetSize // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -92,15 +127,28 @@ class __$$_NcnnYoloxOptionsCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_NcnnYoloxOptions implements _NcnnYoloxOptions {
-  const _$_NcnnYoloxOptions({this.autoDispose = true});
+  const _$_NcnnYoloxOptions(
+      {this.autoDispose = true,
+      this.nmsThresh = yoloxNmsThreshDefault,
+      this.confThresh = yoloxConfThreshDefault,
+      this.targetSize = yoloxTargetSizeDefault});
 
   @override
   @JsonKey()
   final bool autoDispose;
+  @override
+  @JsonKey()
+  final double nmsThresh;
+  @override
+  @JsonKey()
+  final double confThresh;
+  @override
+  @JsonKey()
+  final int targetSize;
 
   @override
   String toString() {
-    return 'NcnnYoloxOptions(autoDispose: $autoDispose)';
+    return 'NcnnYoloxOptions(autoDispose: $autoDispose, nmsThresh: $nmsThresh, confThresh: $confThresh, targetSize: $targetSize)';
   }
 
   @override
@@ -109,11 +157,18 @@ class _$_NcnnYoloxOptions implements _NcnnYoloxOptions {
         (other.runtimeType == runtimeType &&
             other is _$_NcnnYoloxOptions &&
             (identical(other.autoDispose, autoDispose) ||
-                other.autoDispose == autoDispose));
+                other.autoDispose == autoDispose) &&
+            (identical(other.nmsThresh, nmsThresh) ||
+                other.nmsThresh == nmsThresh) &&
+            (identical(other.confThresh, confThresh) ||
+                other.confThresh == confThresh) &&
+            (identical(other.targetSize, targetSize) ||
+                other.targetSize == targetSize));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, autoDispose);
+  int get hashCode =>
+      Object.hash(runtimeType, autoDispose, nmsThresh, confThresh, targetSize);
 
   @JsonKey(ignore: true)
   @override
@@ -123,11 +178,20 @@ class _$_NcnnYoloxOptions implements _NcnnYoloxOptions {
 }
 
 abstract class _NcnnYoloxOptions implements NcnnYoloxOptions {
-  const factory _NcnnYoloxOptions({final bool autoDispose}) =
-      _$_NcnnYoloxOptions;
+  const factory _NcnnYoloxOptions(
+      {final bool autoDispose,
+      final double nmsThresh,
+      final double confThresh,
+      final int targetSize}) = _$_NcnnYoloxOptions;
 
   @override
   bool get autoDispose;
+  @override
+  double get nmsThresh;
+  @override
+  double get confThresh;
+  @override
+  int get targetSize;
   @override
   @JsonKey(ignore: true)
   _$$_NcnnYoloxOptionsCopyWith<_$_NcnnYoloxOptions> get copyWith =>

@@ -10,6 +10,15 @@ import 'package:flutter/services.dart';
 import 'package:ncnn_yolox_flutter/models/models.dart';
 import 'package:path_provider/path_provider.dart';
 
+/// NMS threshold. Default value reference: https://github.com/Megvii-BaseDetection/YOLOX/blob/d9422393113ffcd381a533e91720bee96652477d/demo/ncnn/cpp/yolox.cpp#L30
+const yoloxNmsThreshDefault = 0.45;
+
+/// Threshold of bounding box prob. Default value reference: https://github.com/Megvii-BaseDetection/YOLOX/blob/d9422393113ffcd381a533e91720bee96652477d/demo/ncnn/cpp/yolox.cpp#L31
+const yoloxConfThreshDefault = 0.25;
+
+/// Target image size after resize, might use 416 for small model. Default value reference: https://github.com/Megvii-BaseDetection/YOLOX/blob/d9422393113ffcd381a533e91720bee96652477d/demo/ncnn/cpp/yolox.cpp#L32
+const yoloxTargetSizeDefault = 416;
+
 typedef _KannaRotateNative = Void Function(
   Pointer<Uint8> src,
   Int8 channel,
@@ -64,6 +73,9 @@ typedef _DetectWithPixelsYoloxNative = Pointer<Utf8> Function(
   Int32 pixelFormat,
   Int32 width,
   Int32 height,
+  Double nmsThresh,
+  Double confThresh,
+  Int32 targetSize,
 );
 
 typedef _DetectWithPixelsYolox = Pointer<Utf8> Function(
@@ -71,13 +83,22 @@ typedef _DetectWithPixelsYolox = Pointer<Utf8> Function(
   int pixelFormat,
   int width,
   int height,
+  double nmsThresh,
+  double confThresh,
+  int targetSize,
 );
 
 typedef _DetectWithImagePathYoloxNative = Pointer<Utf8> Function(
   Pointer<Utf8> imagePath,
+  Double nmsThresh,
+  Double confThresh,
+  Int32 targetSize,
 );
 typedef _DetectWithImagePathYolox = Pointer<Utf8> Function(
   Pointer<Utf8> imagePath,
+  double nmsThresh,
+  double confThresh,
+  int targetSize,
 );
 
 typedef _DisposeYoloxNative = Void Function();
@@ -126,20 +147,45 @@ class NcnnYolox {
   late _DisposeYolox _disposeYoloxFunction;
   late _InitYolox _initYoloxFunction;
 
+  /// NMS threshold.
+  double _nmsThresh = yoloxNmsThreshDefault;
+  double get nmsThresh => _nmsThresh;
+
+  /// Threshold of bounding box prob.
+  double _confThresh = yoloxConfThreshDefault;
+  double get confThresh => _confThresh;
+
+  /// Target image size after resize.
+  int _targetSize = yoloxTargetSizeDefault;
+  int get targetSize => _targetSize;
+
   /// Initialize YOLOX
   /// Run it for the first time
   ///
   /// - [modelPath] - path to model file. like "assets/yolox.bin"
   /// - [paramPath] - path to parameter file. like "assets/yolox.param"
   /// - [autoDispose] - If true, multiple calls to initYolox will automatically dispose of recently loaded model.
+  /// - [nmsThresh] NMS threshold.
+  /// - [confThresh] Threshold of bounding box prob.
+  /// - [targetSize] Target image size after resize, might use 416 for small model.
   Future<void> initYolox({
     required String modelPath,
     required String paramPath,
     bool autoDispose = true,
+    double nmsThresh = yoloxNmsThreshDefault,
+    double confThresh = yoloxConfThreshDefault,
+    int targetSize = yoloxTargetSizeDefault,
   }) async {
+    assert(nmsThresh > 0);
+    assert(confThresh > 0);
+    assert(targetSize > 0);
+
     if (autoDispose) {
       dispose();
     }
+    _nmsThresh = nmsThresh;
+    _confThresh = confThresh;
+    _targetSize = targetSize;
 
     final tempModelPath = (await _copy(modelPath)).toNativeUtf8();
     final tempParamPath = (await _copy(paramPath)).toNativeUtf8();
@@ -394,6 +440,9 @@ class NcnnYolox {
         pixelFormat.type,
         width,
         height,
+        nmsThresh,
+        confThresh,
+        targetSize,
       ).toDartString(),
     );
     calloc.free(pixelsNative);
@@ -422,6 +471,9 @@ class NcnnYolox {
     final results = YoloxResults.create(
       _detectWithImagePathYoloxFunction(
         imagePathNative,
+        nmsThresh,
+        confThresh,
+        targetSize,
       ).toDartString(),
     );
     calloc.free(imagePathNative);
