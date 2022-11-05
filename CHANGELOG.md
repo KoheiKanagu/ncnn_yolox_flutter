@@ -1,4 +1,4 @@
-## Unreleased
+## 0.4.1
 
 - Added NMS and confidence and image size options to initYolox. [#77](https://github.com/KoheiKanagu/ncnn_yolox_flutter/pull/77)
 - Recently loaded model can now be disposed of at any time. By default, recently loaded model is automatically disposed of when initYolox is called again. [#76](https://github.com/KoheiKanagu/ncnn_yolox_flutter/pull/)
