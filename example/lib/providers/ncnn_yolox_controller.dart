@@ -13,13 +13,13 @@ import 'package:ncnn_yolox_flutter_example/providers/ncnn_yolox_options.dart';
 
 final ncnnYoloxController =
     StateNotifierProvider<NcnnYoloxController, List<YoloxResults>>(
-  (ref) => NcnnYoloxController(ref.read),
+  NcnnYoloxController.new,
 );
 
 class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
-  NcnnYoloxController(this._read) : super([]);
+  NcnnYoloxController(this.ref) : super([]);
 
-  final Reader _read;
+  final Ref ref;
 
   final _ncnnYolox = NcnnYolox();
 
@@ -31,10 +31,10 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
     await _ncnnYolox.initYolox(
       modelPath: 'assets/yolox/yolox.bin',
       paramPath: 'assets/yolox/yolox.param',
-      autoDispose: _read(ncnnYoloxOptions).autoDispose,
-      nmsThresh: _read(ncnnYoloxOptions).nmsThresh,
-      confThresh: _read(ncnnYoloxOptions).confThresh,
-      targetSize: _read(ncnnYoloxOptions).targetSize,
+      autoDispose: ref.read(ncnnYoloxOptions).autoDispose,
+      nmsThresh: ref.read(ncnnYoloxOptions).nmsThresh,
+      confThresh: ref.read(ncnnYoloxOptions).confThresh,
+      targetSize: ref.read(ncnnYoloxOptions).targetSize,
     );
   }
 
@@ -47,7 +47,7 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
         file.path,
       ).readAsBytesSync(),
     );
-    _read(previewImage.state).state = decodedImage;
+    ref.read(previewImage.notifier).state = decodedImage;
   }
 
   Future<void> detectFromCameraImage(CameraImage cameraImage) async {
@@ -67,10 +67,10 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
               v: cameraImage.planes[2].bytes,
               height: cameraImage.height,
               deviceOrientationType:
-                  _read(myCameraController).deviceOrientationType,
-              sensorOrientation: _read(myCameraController).sensorOrientation,
+                  ref.read(myCameraController).deviceOrientationType,
+              sensorOrientation: ref.read(myCameraController).sensorOrientation,
               onDecodeImage: (image) {
-                _read(previewImage.state).state = image;
+                ref.read(previewImage.notifier).state = image;
                 completer.complete();
               },
             )
@@ -82,10 +82,10 @@ class NcnnYoloxController extends StateNotifier<List<YoloxResults>> {
               pixels: cameraImage.planes[0].bytes,
               height: cameraImage.height,
               deviceOrientationType:
-                  _read(myCameraController).deviceOrientationType,
-              sensorOrientation: _read(myCameraController).sensorOrientation,
+                  ref.read(myCameraController).deviceOrientationType,
+              sensorOrientation: ref.read(myCameraController).sensorOrientation,
               onDecodeImage: (image) {
-                _read(previewImage.state).state = image;
+                ref.read(previewImage.notifier).state = image;
                 completer.complete();
               },
             )
