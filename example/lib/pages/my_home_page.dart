@@ -22,7 +22,7 @@ class MyHomePage extends HookConsumerWidget {
             title: const Text('from gallery image'),
             onTap: () => _pickImage(
               context,
-              ref.read,
+              ref.read(ncnnYoloxController.notifier),
               ImageSource.gallery,
             ),
           ),
@@ -30,7 +30,7 @@ class MyHomePage extends HookConsumerWidget {
             title: const Text('from camera image'),
             onTap: () => _pickImage(
               context,
-              ref.read,
+              ref.read(ncnnYoloxController.notifier),
               ImageSource.camera,
             ),
           ),
@@ -53,14 +53,13 @@ class MyHomePage extends HookConsumerWidget {
 
   Future<void> _pickImage(
     BuildContext context,
-    Reader read,
+    NcnnYoloxController controller,
     ImageSource imageSource,
   ) async {
     final navigator = Navigator.of(context);
 
     final file = await ImagePicker().pickImage(source: imageSource);
     if (file != null) {
-      final controller = read(ncnnYoloxController.notifier);
       await controller.initialize();
       await controller.detectFromImageFile(file);
 

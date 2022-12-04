@@ -5,13 +5,13 @@ import 'package:ncnn_yolox_flutter/ncnn_yolox_flutter.dart';
 import 'package:ncnn_yolox_flutter_example/providers/ncnn_yolox_controller.dart';
 
 final myCameraController = Provider(
-  (ref) => MyCameraController(ref.read),
+  MyCameraController.new,
 );
 
 class MyCameraController {
-  MyCameraController(this._read);
+  MyCameraController(this.ref);
 
-  final Reader _read;
+  final Ref ref;
 
   CameraController? _cameraController;
 
@@ -25,7 +25,7 @@ class MyCameraController {
   bool _isProcessing = false;
 
   Future<void> startImageStream() async {
-    await _read(ncnnYoloxController.notifier).initialize();
+    await ref.read(ncnnYoloxController.notifier).initialize();
 
     final camera = (await availableCameras())[0];
 
@@ -43,7 +43,9 @@ class MyCameraController {
         }
 
         _isProcessing = true;
-        await _read(ncnnYoloxController.notifier).detectFromCameraImage(image);
+        await ref
+            .read(ncnnYoloxController.notifier)
+            .detectFromCameraImage(image);
         _isProcessing = false;
       },
     );
