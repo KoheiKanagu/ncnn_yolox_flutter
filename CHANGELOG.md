@@ -1,6 +1,7 @@
-## Unreleased
+## 0.4.2
 
 - Fixed a problem with incorrect object detection on iOS when the image source is camera in the example app. [#83](https://github.com/KoheiKanagu/ncnn_yolox_flutter/pull/83)
+- Supports the latest riverpod with example app. [#82](https://github.com/KoheiKanagu/ncnn_yolox_flutter/pull/82)
 
 ## 0.4.1
 
