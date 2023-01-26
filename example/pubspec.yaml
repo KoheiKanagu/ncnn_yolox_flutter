@@ -25,7 +25,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   freezed: ^2.3.2
-  pedantic_mono: ^1.20.1
+  pedantic_mono: ^1.21.1
 
 flutter:
   uses-material-design: true
