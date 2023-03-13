@@ -31,7 +31,7 @@ jobs:
 
       - name: CocoaPods Cache
         if: ${{ runner.os == 'macOS' }}
-        uses: actions/cache@v3.2.3
+        uses: actions/cache@v3.3.1
         with:
           path: ./example/ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}-v1
@@ -40,7 +40,7 @@ jobs:
 
       - name: Gradle Cache
         if: ${{ runner.os == 'linux' }}
-        uses: actions/cache@v3.2.3
+        uses: actions/cache@v3.3.1
         with:
           path: |
             ~/.gradle/caches

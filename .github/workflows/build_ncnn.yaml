@@ -92,7 +92,7 @@ jobs:
     steps:
       - name: cache-openmp
         id: cache-openmp
-        uses: actions/cache@v3.2.3
+        uses: actions/cache@v3.3.1
         with:
           path: openmp-install
           key: openmp-ios-bitcode-release-11.0.0-e418b04a153cea781c7e92e04b8a111cc8d224a1

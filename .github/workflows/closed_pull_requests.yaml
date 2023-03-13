@@ -29,7 +29,7 @@ jobs:
 
       - name: Gradle Cache
         if: ${{ runner.os == 'linux' }}
-        uses: actions/cache@v3.2.3
+        uses: actions/cache@v3.3.1
         with:
           path: |
             ~/.gradle/caches
