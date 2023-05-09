@@ -18,7 +18,7 @@ dependencies:
   image_picker: ^0.8.6
   ncnn_yolox_flutter:
     path: ../
-  path_provider: ^2.0.11
+  path_provider: ^2.0.15
 
 dev_dependencies:
   build_runner: ^2.3.3
