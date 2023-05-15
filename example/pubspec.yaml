@@ -7,7 +7,7 @@ environment:
   sdk: ">=2.18.0 <3.0.0"
 
 dependencies:
-  adaptive_dialog: ^1.8.0+1
+  adaptive_dialog: ^1.8.3+1
   camera: ^0.10.0+4
   flutter:
     sdk: flutter
